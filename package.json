@@ -1,0 +1,15 @@
+{
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+        "postinstall": "npm run install:backend && npm run install:frontend && echo 'Install Complete!'",
+        "install:frontend": "echo 'Installing Frontend' && cd Frontend && npm i",
+        "install:backend": "echo 'Installing Backend' && cd Backend && npm i",
+        "dev": "concurrently 'npm:backend:dev' 'npm:frontend:dev'",
+        "backend:dev":"cd Backend && npm run dev",
+        "frontend:dev":"cd Frontend && npm run dev"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}
