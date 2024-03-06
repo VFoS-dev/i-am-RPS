@@ -22,3 +22,6 @@ app.get('/', (req, res) => {
 io.on("connection", require('./src/sockets'));
 
 console.log(`listening on port ${port}`);
+
+
+require('./src/service/openai')
