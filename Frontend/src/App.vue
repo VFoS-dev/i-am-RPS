@@ -1,5 +1,6 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import { checkConnection } from '@/service/api-service'
 import HelloWorld from './components/HelloWorld.vue'
 </script>
 

@@ -1,7 +1,9 @@
+const _env = import.meta.env
+
 export function env(check, fallback) {
-    if (!process.env[check]) {
+    if (!_env[check]) {
         console.warn(`⚠️ Environment variable "${check}" was not found, using fallback: "${fallback}"`)
         return fallback;
     }
-    return process.env[check]
+    return _env[check]
 }
