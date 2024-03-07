@@ -11,4 +11,7 @@ mongoose.Promise = global.Promise;
 
 module.exports = {
   Games: require('../models/games.model'),
+  IAm: require('../models/iAm.model'),
+  History: require('../models/history.model'),
+  Player: require('../models/player.model'),
 };
