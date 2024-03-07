@@ -1,5 +1,4 @@
 const { errorHandler } = require('../_helper/error');
-const { fn } = require('../_helper/misc');
 
 const modules = {
     game: require('./gameController'),
@@ -7,6 +6,8 @@ const modules = {
 }
 
 module.exports = (socket) => new Proxy(modules, {
-    apply: (target, thisArg, [data, callback = fn]) =>
-        target(socket, data).catch(errorHandler).finally(callback)
+    get: (target, key) => new Proxy(target[key], {
+        get: (target, key) => (data, callback) => target[key](socket, data)
+            .catch(errorHandler).finally(callback)
+    })
 })

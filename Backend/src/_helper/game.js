@@ -10,7 +10,13 @@ const historyResults = {
     player2Won: "player2",
 }
 
+function generateRandomCode(length = 5) {
+    const options = "0123456789";
+    return [...new Array(5)].map(_ => options[Math.floor(options.length * Math.random())]).join('')
+}
+
 module.exports = {
     gameStates,
-    historyResults
+    historyResults,
+    generateRandomCode,
 };

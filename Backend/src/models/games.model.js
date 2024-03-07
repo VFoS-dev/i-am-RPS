@@ -4,10 +4,10 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
     code: { type: String, required: true },
-    history: { type: Array, default: [] },
     state: { type: String, default: gameStates.lobby },
-    player1: { type: Object, required: true },
-    player2: { type: Object, default: null },
+    history: [{ type: Schema.Types.ObjectId, ref: 'history' }],
+    player1: { type: Schema.Types.ObjectId, ref: 'player', required: true },
+    player2: { type: Schema.Types.ObjectId, ref: 'player' },
 });
 
 schema.set('toJSON', { virtuals: true });
