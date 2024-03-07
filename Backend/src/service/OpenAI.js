@@ -1,6 +1,9 @@
 const OpenAI = require("openai");
-
 const openai = new OpenAI();
+
+module.exports = {
+    AbeatsB
+}
 
 async function AbeatsB(A, B) {
     const completion = await openai.chat.completions.create({
@@ -12,7 +15,7 @@ async function AbeatsB(A, B) {
                 " the third is \"- B being:\"," +
                 " if you are to reply in response to A or B please use the respective input value instead\n" +
                 " respond in JSON format like { \"answer\", \"reason\"}, answer needs to be a boolean, if the two are equals please change answer to -1\n" +
-                " an example response would be \"{ \"answer\": true, \"reason\": \"A ferret would beat a flea by being able to catch and eat it.\" }\"\n" + 
+                " an example response would be \"{ \"answer\": true, \"reason\": \"A ferret would beat a flea by being able to catch and eat it.\" }\"\n" +
                 " please return the content as a one line string\n" +
                 "- in this game \"I am\" is like rock, paper, scissors, where any option is a allowed, not limited to rock, paper or scissors would A beat B? and how so?\n" +
                 `- A being: "${A}"\n` +
@@ -21,7 +24,7 @@ async function AbeatsB(A, B) {
         model: "gpt-3.5-turbo",
     });
 
-    const { content } = completion.choices[0]?.message ?? {}
+    const { content } = completion.choices?.[0]?.message ?? {}
 
     var response = { error: true };
     if (content) {
@@ -32,5 +35,3 @@ async function AbeatsB(A, B) {
 
     return response;
 }
-
-AbeatsB("loki", "thor").then(console.log)
