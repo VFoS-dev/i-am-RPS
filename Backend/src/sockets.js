@@ -16,10 +16,4 @@ module.exports = function (socket) {
     socket.on("game_kickPlayer", controller(socket).game.kickPlayer);
     socket.on("google_imageSearch", controller(socket).google.imageSearch);
 
-    /*
-    socket.on("join_room", (data) => {
-        socket.join('data')
-        // socket.to(data.room).emit("send", data)
-    })
-    */
 }

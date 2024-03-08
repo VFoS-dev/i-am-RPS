@@ -1,4 +1,7 @@
+const { env } = require('../_helper/env')
+const { fn } = require('../_helper/misc')
 const { errorHandler } = require('../_helper/error');
+const log = (...arguments) => env("SocketLogging", false) && console.log(...arguments)
 
 const modules = {
     game: require('./gameController'),
@@ -6,8 +9,11 @@ const modules = {
 }
 
 module.exports = (socket) => new Proxy(modules, {
-    get: (target, key) => new Proxy(target[key], {
-        get: (target, key) => (data, callback) => target[key](socket, data)
-            .catch(errorHandler).finally(callback)
+    get: (target, _key) => new Proxy(target[_key], {
+        get: (target, key) => (data, callback = fn) => {
+            log(`- - Socket: ${socket.id} - - Call: ${_key}.${key}`)
+            target[key](socket, data)
+                .then(callback).catch((e) => callback(errorHandler(e)))
+        }
     })
 })

@@ -6,24 +6,23 @@ const socket = io(API);
 socket.on('gameUpdated', gameUpdated)
 
 export async function gameUpdated(data) {
-    console.log(data);
+    console.log('gameUpdated', data);
 }
 
 export async function gameCreate() {
-    socket.emit('game_create', {}, (e) => { console.log(e) })
+    socket.emit('game_create', {}, (e) => { console.log('created', e) })
 }
-gameCreate()
 
 export async function gameJoin(gameCode) {
     socket.emit('game_join', { gameCode }, HandleAPIGame)
 }
 
-export async function gameIAm() {
-    socket.emit('game_iAm', {}, HandleAPIGame)
-}
-
 export async function gameKickPlayer() {
     socket.emit('game_kickPlayer', {}, HandleAPIGame)
+}
+
+export async function gameIAm() {
+    socket.emit('game_iAm', {}, HandleAPIGame)
 }
 
 export async function googleImageSearch() {
