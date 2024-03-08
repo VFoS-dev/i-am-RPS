@@ -1,4 +1,5 @@
 import { env } from "@/_helper/env";
+import { handleAPI } from '@/_helper/api-helper'
 import { io } from "socket.io-client";
 import { modalData } from '@/stores/modalData'
 
@@ -16,7 +17,7 @@ const gameId = 1 // fix later
 
 export async function checkConnection() {
     try { await (await fetch(API)).json() }
-    catch (error) { modalData.add('Unable to connect to server', 'Server Error') }
+    catch (error) { modalData.push('Unable to connect to server', 'Server Error') }
 }
 
 function notify(data) {
@@ -32,47 +33,37 @@ function gameUpdated(data) {
 }
 
 export async function gameCreate() {
-    socket.emit('game_create', {}, HandleAPIGame)
+    socket.emit('game_create', {}, handleAPI({
+        eCallback: modalData.add,
+    }))
 }
 
 export async function gameJoin(gameCode) {
-    socket.emit('game_join', { gameCode }, HandleAPIGame)
+    socket.emit('game_join', { gameCode }, handleAPI({
+        eCallback: modalData.add,
+    }))
 }
 
 export async function gameKickPlayer(playerId) {
-    socket.emit('game_kickPlayer', { gameId, playerId }, HandleAPIGame)
+    socket.emit('game_kickPlayer', { gameId, playerId }, handleAPI({
+        eCallback: modalData.add,
+    }))
 }
 
 export async function gameIAm(prompt, image) {
-    socket.emit('game_iAm', { gameId, prompt, image }, HandleAPIGame)
+    socket.emit('game_iAm', { gameId, prompt, image }, handleAPI({
+        eCallback: modalData.add,
+    }))
 }
 
 export async function startGame() {
-    socket.emit('game_start', { gameId }, HandleAPIGame)
+    socket.emit('game_start', { gameId }, handleAPI({
+        eCallback: modalData.add,
+    }))
 }
 
 export async function googleImageSearch() {
-    socket.emit('google_imageSearch', {}, HandleAPIGoogle)
-}
-
-function HandleAPIGame({ error, success, ...rem } = {}) {
-    if (error && (rem.message + rem.title)) {
-        const { message, title } = rem
-        modalData.add(message, title)
-    }
-
-    if (success) {
-        console.log('success', rem);
-    }
-}
-
-function HandleAPIGoogle({ error, success, ...rem } = {}) {
-    if (error && (rem.message + rem.title)) {
-        const { message, title } = rem
-        modalData.add(message, title)
-    }
-
-    if (success) {
-        console.log('success', rem);
-    }
+    socket.emit('google_imageSearch', {}, handleAPI({
+        eCallback: modalData.add,
+    }))
 }
