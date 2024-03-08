@@ -1,5 +1,6 @@
 import { env } from "@/_helper/env";
 import { io } from "socket.io-client";
+import { modalData } from '@/stores/modalData'
 
 const API = env('VITE_API', 'http://localhost:3000')
 const socket = io(API);
@@ -14,10 +15,8 @@ socket.on('connect', function (e) {
 const gameId = 1 // fix later
 
 export async function checkConnection() {
-    const data = await (await fetch(API)).json()
-    if (!data.success) {
-        console.error('Api failed to connect');
-    }
+    try { await (await fetch(API)).json() }
+    catch (error) { modalData.add('Unable to connect to server', 'Server Error') }
 }
 
 function notify(data) {
@@ -33,7 +32,7 @@ function gameUpdated(data) {
 }
 
 export async function gameCreate() {
-    socket.emit('game_create', {}, (e) => { console.log('created', e) })
+    socket.emit('game_create', {}, HandleAPIGame)
 }
 
 export async function gameJoin(gameCode) {
@@ -57,8 +56,9 @@ export async function googleImageSearch() {
 }
 
 function HandleAPIGame({ error, success, ...rem } = {}) {
-    if (error) {
-        console.log('error', rem);
+    if (error && (rem.message + rem.title)) {
+        const { message, title } = rem
+        modalData.add(message, title)
     }
 
     if (success) {
@@ -67,8 +67,9 @@ function HandleAPIGame({ error, success, ...rem } = {}) {
 }
 
 function HandleAPIGoogle({ error, success, ...rem } = {}) {
-    if (error) {
-        console.log('error', rem);
+    if (error && (rem.message + rem.title)) {
+        const { message, title } = rem
+        modalData.add(message, title)
     }
 
     if (success) {
