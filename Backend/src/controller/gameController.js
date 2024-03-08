@@ -95,6 +95,8 @@ async function iAm(socket, { gameId, prompt, image }) {
     if (!game) throw new InvalidAttempt('Game was not found');
     if (game.state === gameStates.lobby)
         throw new InvalidAttempt('Game has not started yet');
+    if (game.state === gameStates.roundEnd)
+        throw new InvalidAttempt('Game proccessing selection');
     if (game.state === gameStates.results)
         throw new InvalidAttempt('Game has ended');
 
@@ -122,16 +124,14 @@ async function roundEnd(socket, { gameId }) {
 
     const check = {
         [gameStates.turn_player1]: {
-            nextState: gameStates.turn_player2,
             A: 'player1', B: 'player2',
         },
         [gameStates.turn_player2]: {
-            nextState: gameStates.turn_player1,
             A: 'player2', B: 'player1',
         },
     }[game.state]
 
-    game.state = check.nextState;
+    game.state = gameStates.roundEnd;
     await game.save()
 
     if (game.player1.iAm?.prompt && game.player2.iAm?.prompt) {
