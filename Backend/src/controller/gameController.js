@@ -4,6 +4,7 @@ const gameService = require('../service/gameService');
 const playerService = require('../service/playerService');
 const iAmService = require('../service/iAmService');
 const { AbeatsB } = require('../service/openai');
+const { addHistory } = require('../service/historyService');
 
 module.exports = {
     create,
@@ -24,7 +25,7 @@ async function create(socket) {
     return {
         success: true,
         gameId: game._id,
-        player,
+        player: 1,
         gameCode: game.code,
     }
 }
@@ -46,7 +47,7 @@ async function join(socket, { gameCode }) {
     return {
         success: true,
         gameId: game._id,
-        player,
+        player: 2,
         gameCode: game.code,
     }
 }
@@ -151,6 +152,7 @@ async function handleResult(socket, gameId, { error, reason, answer }, { A: play
     if (error) {
         game.state = gameStates[`turn_${playerA}`]
         await iAmService.clearIAm(game[playerA].iAm)
+        await game.save()
 
         updateLobby(socket, gameId)
         notifyPlayer(socket, gameId, reason)
@@ -158,12 +160,13 @@ async function handleResult(socket, gameId, { error, reason, answer }, { A: play
         return { error, reason }
     }
 
-    let focusPlayer;
-    if (answer) { // A won
-        focusPlayer = playerB
-    } else { // B won or tie
-        focusPlayer = playerA
-    }
+    const { focusPlayer, wonPlayer } = {
+        1: { focusPlayer: playerB, wonPlayer: playerA },
+        0: { focusPlayer: playerA, wonPlayer: playerB, },
+    }[+answer]
+
+    const history = addHistory(game.player1.iAm.prompt, game.player2.iAm.prompt, wonPlayer, reason)
+    game.history.push(history.id)
 
     const player = await playerService.damagePlayer(game[focusPlayer].id)
     await iAmService.clearIAm(game[focusPlayer].id)

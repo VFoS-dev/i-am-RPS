@@ -14,6 +14,6 @@ module.exports = function (socket) {
     socket.on("game_join", controller(socket).game.join);
     socket.on("game_iAm", controller(socket).game.iAm);
     socket.on("game_kickPlayer", controller(socket).game.kickPlayer);
+    socket.on("game_start", controller(socket).game.startGame)
     socket.on("google_imageSearch", controller(socket).google.imageSearch);
-
 }
