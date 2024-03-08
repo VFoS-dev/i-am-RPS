@@ -12,6 +12,8 @@ module.exports = {
     kickPlayer,
     iAm,
     startGame,
+    playerDisconnect,
+    playerReconnect
 }
 
 async function create(socket) {
@@ -83,6 +85,38 @@ async function startGame(socket, { gameId }) {
     game.state = gameStates[playerTurn];
 
     await game.save();
+    updateLobby(socket, game._id);
+
+    return {
+        success: true
+    }
+}
+
+async function playerDisconnect(socket, reason) {
+    const player = await playerService.disconnectPlayer(socket.id);
+    if (!player) throw new InvalidAttempt('Player does not exist')
+
+    const game = await gameService.getGameByPlayerId(player._id)
+    if (!game) throw new InvalidAttempt('Game does not exist')
+
+    if ((!game.player1 || game.player1.disconnected) && (!game.player2 || game.player2.disconnected)) {
+        await game.remove()
+    }
+
+    return {
+        success: true
+    }
+}
+
+async function playerReconnect(socket, { socketId, player, gameCode }) {
+    const game = await gameService.findGameByCode(gameCode)
+    if (!game) throw new InvalidAttempt('Game no longer exists')
+    const _player = game[`player${player}`]
+    if (_player.socketId !== socketId) throw new InvalidAttempt('Previous player signiture does not match')
+
+    await playerService.updateSocketId(_player.id, socket.id)
+    socket.join(game.code);
+
     updateLobby(socket, game._id);
 
     return {

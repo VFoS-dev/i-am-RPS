@@ -6,7 +6,7 @@ class InvalidAttempt extends Error {
 }
 
 function errorHandler(error) {
-    switch (e.constructor) {
+    switch (error.constructor) {
         case InvalidAttempt:
             return {
                 error: true,

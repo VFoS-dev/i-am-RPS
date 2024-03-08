@@ -8,6 +8,14 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
+  css: {
+    preprocessorOptions: {
+      less: {
+        // Import your main.less file globally
+        additionalData: `@import "@/assets/main.less";`,
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))

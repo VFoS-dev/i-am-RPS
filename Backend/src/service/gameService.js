@@ -5,6 +5,7 @@ module.exports = {
     newGame,
     findGameByCode,
     getGameById,
+    getGameByPlayerId,
 }
 
 async function newGame(player1, keyLength = 4, attempts = 0) {
@@ -40,6 +41,25 @@ async function findGameByCode(code) {
 
 async function getGameById(id) {
     return await Games.findById(id).populate([
+        {
+            path: 'player1', strictPopulate: false,
+            populate: { path: 'iAm' }
+        },
+        {
+            path: 'player2', strictPopulate: false,
+            populate: { path: 'iAm' }
+        },
+        { path: "history", strictPopulate: false }
+    ]);
+}
+
+async function getGameByPlayerId(playerId) {
+    return await Games.findOne({
+        $or: [
+            { "player1._id": playerId, "player1.disconnected": false },
+            { "player2._id": playerId, "player2.disconnected": false }
+        ]
+    }).populate([
         {
             path: 'player1', strictPopulate: false,
             populate: { path: 'iAm' }

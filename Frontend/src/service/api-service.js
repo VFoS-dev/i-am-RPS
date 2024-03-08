@@ -7,6 +7,9 @@ const socket = io(API);
 socket.on('gameUpdated', gameUpdated)
 socket.on('notify', notify)
 socket.on('kickFromLobby', kickFromLobby)
+socket.on('connect', function (e) {
+    console.log(socket.id)
+});
 
 const gameId = 1 // fix later
 

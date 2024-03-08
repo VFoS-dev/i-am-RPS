@@ -6,10 +6,8 @@ const log = (...arguments) => env("SocketLogging", false) && console.log(...argu
 module.exports = function (socket) {
     log("Connection made from socket:", socket.id);
 
-    socket.on("disconnect", (reason) => {
-        log("Socket disconnected:", socket.id);
-    });
-
+    socket.on("disconnect", controller(socket).game.playerDisconnect);
+    socket.on("reconnect", controller(socket).game.playerReconnect)
     socket.on("game_create", controller(socket).game.create);
     socket.on("game_join", controller(socket).game.join);
     socket.on("game_iAm", controller(socket).game.iAm);

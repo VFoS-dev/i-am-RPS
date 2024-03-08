@@ -6,6 +6,8 @@ module.exports = {
     deletePlayer,
     getPlayerById,
     damagePlayer,
+    disconnectPlayer,
+    updateSocketId,
 }
 
 async function newPlayer(socket) {
@@ -42,4 +44,17 @@ async function damagePlayer(playerId, damage = 10) {
     await player.save();
 
     return player;
+}
+
+async function disconnectPlayer(socketId) {
+    const player = await Player.findOne({ socketId })
+    if (!player) return
+
+    player.disconnected = true;
+    await player.save()
+    return player
+}
+
+async function updateSocketId(playerId, socketId) {
+    await Player.updateOne({ _id: playerId }, { socketId })
 }
