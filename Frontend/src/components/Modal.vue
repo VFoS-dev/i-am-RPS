@@ -18,6 +18,7 @@ const CloseModal = ({ target }) => target.id == "modal-close" && modalData.remov
 
 <style scoped lang="less">
 .modal-container {
+    z-index: 12;
     position: absolute;
     top: 0;
     left: 0;

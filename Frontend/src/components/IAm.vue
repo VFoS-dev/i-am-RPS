@@ -1,5 +1,5 @@
 <template>
-    <div class="iAm-container" :class="titleStore.current">
+    <div class="iAm-container" :class="classes">
         <div class="position rock">
             <div class="choice"></div>
         </div>
@@ -10,23 +10,38 @@
             <div class="choice"></div>
         </div>
         <div class="position infinite">
-            <div class="choice"></div>
+            <div class="choice">
+                <div class="color-match"></div>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup>
 import { titleStore } from '@/stores/titleStore';
+import { computed } from 'vue'
 
+const classes = computed(() => {
+    const { current, last } = titleStore
+    return `${last} ${current == last}`
+})
 </script>
 
 <style scoped lang="less">
+.color-match {
+    border: none !important;
+    background-color: transparent;
+    transition: background-color .5s;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 100%;
+    background-image: url('/images/infinite.png');
+}
+
 .iAm-container {
-    --rock-color: #0000;
-    --paper-color: #0000;
-    --scissors-color: #0000;
-    --default-color: #0000;
-    --selected-color: #c4c4c471;
+    --default-color: var(--background-color);
+    --selected: transparent;
+    --selected-color: var(--background-color);
 
     top: 0;
     left: 0;
@@ -37,23 +52,51 @@ import { titleStore } from '@/stores/titleStore';
     align-items: center;
     z-index: 0;
     position: absolute;
-    transition: background .5s;
+    transition: background-color .75s;
+    background-color: var(--selected-color);
+
+    &.infinite {
+        background: radial-gradient(circle at center, var(--selected) 0%, var(--default-color) 25%);
+        --selected-color: white;
+
+        .infinite .choice {
+            background-color: var(--selected-color);
+        }
+    }
 
     &.rock {
-        background: conic-gradient(#c4c4c471 0deg, #0000 60deg, #0000 300deg, #c4c4c471 360deg);
-        --rock-color: #c4c4c471;
+        background: conic-gradient(var(--selected) 0deg, var(--default-color) 60deg, var(--default-color) 300deg, var(--selected) 360deg);
+        --selected-color: blue;
+
+        .rock .choice {
+            background-color: var(--selected-color);
+        }
     }
 
     &.paper {
-        --paper-color: #c4c4c471;
+        background: conic-gradient(var(--default-color) 60deg, var(--selected) 120deg, var(--default-color) 180deg);
+        --selected-color: green;
 
-        background: conic-gradient(#0000 60deg, #c4c4c471 120deg, #0000 180deg);
+        .paper .choice {
+            background-color: var(--selected-color);
+        }
     }
 
     &.scissors {
-        --scissors-color: #c4c4c471;
+        background: conic-gradient(var(--default-color) 180deg, var(--selected) 240deg, var(--default-color) 300deg);
+        --selected-color: red;
 
-        background: conic-gradient(#0000 180deg, #c4c4c471 240deg, #0000 300deg);
+        .scissors .choice {
+            background-color: var(--selected-color);
+        }
+    }
+
+    &.true {
+        .color-match {
+            background-color: var(--selected-color) !important;
+        }
+
+        background-color: var(--selected-color);
     }
 }
 
@@ -61,6 +104,7 @@ import { titleStore } from '@/stores/titleStore';
     position: absolute;
     transform-origin: center;
 
+    .color-match,
     .choice {
         width: 70px;
         height: 70px;
@@ -69,10 +113,12 @@ import { titleStore } from '@/stores/titleStore';
         background-position: center;
         border-radius: 100%;
         border: 5px solid black;
+        transition: background-color .25s;
     }
 
     &.infinite .choice {
-        background-image: url('/images/infinite.png');
+        transition: background-image .5s;
+        animation: rainbow 7s linear infinite;
     }
 
     &.rock {
@@ -97,6 +143,24 @@ import { titleStore } from '@/stores/titleStore';
         .choice {
             background-image: url('/images/scissors.png');
         }
+    }
+}
+
+@keyframes rainbow {
+    0% {
+        background-color: red;
+    }
+
+    33% {
+        background-color: green;
+    }
+
+    66% {
+        background-color: blue;
+    }
+
+    100% {
+        background-color: red;
     }
 }
 </style>

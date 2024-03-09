@@ -4,10 +4,10 @@ import pinia from './piniaInstance';
 const useTitleStore = defineStore('titleStore', {
     state: () => ({
         current: '',
-        last: '',
+        last: 'infinite',
         ticks: 0,
-        hold: 10,
-        typing: 12,
+        hold: 5,
+        typing: 3,
         interval: null,
     }),
     actions: {

@@ -36,7 +36,7 @@ async function getPlayerById(playerId) {
     ]);
 }
 
-async function damagePlayer(playerId, damage = 10) {
+async function damagePlayer(playerId, damage = 1) {
     const player = await getPlayerById(playerId)
     if (!player) throw new InvalidAttempt('Player not found')
 
