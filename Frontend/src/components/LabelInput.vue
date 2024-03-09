@@ -18,7 +18,8 @@ const props = defineProps({
     minlength: String,
     max: String,
     min: String,
-    id: String
+    id: String,
+    autocomplete: String
 })
 const active = ref(false);
 const input = ref();

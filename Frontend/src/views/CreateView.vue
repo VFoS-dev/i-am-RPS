@@ -1,21 +1,19 @@
 <template>
-    <div class="container">
-        <InsetCircles class="modal" size="4rem" cardColor="white">
-            <h1>Host Game</h1>
-            <form @submit="handleSubmit">
-                <LabelInput @onChange="handleChange" id="playerName" maxlength="25">
-                    Player Name
-                </LabelInput>
-                <LabelInput @onChange="handleChange" id="health" type="number" placeholder="5" max='20' min="1">
-                    Player Health
-                </LabelInput>
-                <LabelCheckbox @onChange="handleChange" id="explicit" :checked="false">
-                    Allow Explicit Images
-                </LabelCheckbox>
-                <Button type="submit">Create</Button>
-            </form>
-        </InsetCircles>
-    </div>
+    <InsetCircles class="modal" size="4rem" cardColor="white">
+        <h1>Host Game</h1>
+        <form @submit="handleSubmit">
+            <LabelInput @onChange="handleChange" id="playerName" maxlength="25">
+                Player Name
+            </LabelInput>
+            <LabelInput @onChange="handleChange" id="health" type="number" placeholder="5" max='20' min="1">
+                Player Health
+            </LabelInput>
+            <LabelCheckbox @onChange="handleChange" id="explicit" :checked="false">
+                Allow Explicit Images
+            </LabelCheckbox>
+            <Button type="submit">Create</Button>
+        </form>
+    </InsetCircles>
 </template>
 
 <script setup>
@@ -32,11 +30,11 @@ const values = ref({
 })
 
 function handleChange({ target: { id, value } }) {
-    if (id == 'health' && !value) {
-        value = 5
+    if (id == 'health') {
+        if (!value) value = 5
+        value = parseInt(value)
     }
     values.value[id] = value
-    console.log(values.value);
 }
 
 function handleSubmit(e) {
@@ -49,13 +47,6 @@ function handleSubmit(e) {
 <style scoped lang="less">
 h1 {
     text-align: center;
-}
-
-.container {
-    min-height: 100dvh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 form,
