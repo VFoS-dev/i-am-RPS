@@ -29,6 +29,7 @@ async function create(socket) {
         gameId: game._id,
         player: 1,
         gameCode: game.code,
+        socketId: socket.id,
     }
 }
 
@@ -51,6 +52,7 @@ async function join(socket, { gameCode }) {
         gameId: game._id,
         player: 2,
         gameCode: game.code,
+        socketId: socket.id,
     }
 }
 
@@ -62,8 +64,10 @@ async function kickPlayer(socket, { gameId, playerId }) {
     if (game.player2?.id !== playerId) throw new InvalidAttempt('That Player is no longer in the game');
 
     const player = await playerService.getPlayerById(game.player2.id);
-    kickFromLobby(socket, player.socketId);
     game.player2 = null;
+
+    socket.leave(game.code)
+    socket.to(player.socketId).emit("kickFromLobby")
 
     await game.save();
     await playerService.deletePlayer(player.id);
@@ -226,10 +230,6 @@ async function updateLobby(socket, gameId) {
     socket.emit("gameUpdated", game);
 }
 
-async function notifyPlayer(socket, socketId, message) {
-    socket.to(socketId).emit('notify', { message })
-}
-
-async function kickFromLobby(socket, socketId) {
-    socket.to(socketId).emit("kickFromLobby")
+async function notifyPlayer(socket, socketId, message, title = 'Announcement') {
+    socket.to(socketId).emit('notify', { message, title })
 }

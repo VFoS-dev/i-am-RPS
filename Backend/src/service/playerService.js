@@ -56,5 +56,5 @@ async function disconnectPlayer(socketId) {
 }
 
 async function updateSocketId(playerId, socketId) {
-    await Player.updateOne({ _id: playerId }, { socketId })
+    await Player.updateOne({ _id: playerId }, { socketId, disconnected: false })
 }

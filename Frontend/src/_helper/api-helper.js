@@ -1,8 +1,8 @@
 import { fn } from "./misc";
 
-export function handleAPI({ sCallback = fn, eCallback = fn } = {}) {
+export function handleAPI({ onSuccess = fn, onError = fn } = {}) {
     return ({ error, success, ...rem } = {}) => {
-        if (success) sCallback(rem)
-        if (error) eCallback(rem)
+        if (success) onSuccess(rem)
+        if (error) onError(rem)
     }
 }
