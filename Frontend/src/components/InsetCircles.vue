@@ -36,13 +36,15 @@ const styles = computed(() => {
     --gap: 5px;
     --size: 3rem;
     --border-color: white;
+    z-index: 1;
     height: fit-content;
     background-color: var(--card-color);
     padding: 2rem;
     position: relative;
     overflow: hidden;
     box-shadow: inset 1px 1px var(--border-color),
-        inset -1px -1px var(--border-color);
+        inset -1px -1px var(--border-color),
+        0 0 25px var(--background-color);
 
     .decor {
         position: absolute;

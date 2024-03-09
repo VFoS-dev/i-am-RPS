@@ -3,6 +3,7 @@ import pinia from './piniaInstance';
 
 const useTitleStore = defineStore('titleStore', {
     state: () => ({
+        current: '',
         last: '',
         ticks: 0,
         hold: 10,
@@ -36,7 +37,7 @@ const useTitleStore = defineStore('titleStore', {
             this.changeTitle(typing)
         },
         randomTitle() {
-            const options = ['rock', 'paper', 'scissors', 'infinity'].filter(o => o !== this.last)
+            const options = ['rock', 'paper', 'scissors', 'infinite'].filter(o => o !== this.last)
             const newTitle = options[Math.floor(options.length * Math.random())]
             this.last = newTitle
             this.changeFavicon(newTitle)
@@ -53,6 +54,7 @@ const useTitleStore = defineStore('titleStore', {
             link.href = `/favicon-${to}.ico`;
         },
         changeTitle(to) {
+            this.current = to;
             document.title = `I am: ${to}`
         }
     }
