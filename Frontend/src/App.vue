@@ -12,5 +12,3 @@ checkConnection()
 import { titleStore } from '@/stores/titleStore';
 titleStore.startClock()
 </script>
-
-<style scoped lang="less"></style>

@@ -10,8 +10,8 @@ module.exports = {
     updateSocketId,
 }
 
-async function newPlayer(socket) {
-    const player = new Player({ socketId: socket.id });
+async function newPlayer(socket, playerName, health) {
+    const player = new Player({ socketId: socket.id, playerName, maxHealth: health, health });
     await player.save();
     return player;
 }

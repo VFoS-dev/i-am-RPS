@@ -17,8 +17,8 @@ module.exports = {
     playerReconnect
 }
 
-async function create(socket, { explicit, health }) {
-    const player = await playerService.newPlayer(socket);
+async function create(socket, { explicit, playerName, health }) {
+    const player = await playerService.newPlayer(socket, playerName, health);
     const config = await configService.addConfig(health, explicit)
     const game = await gameService.newGame(player._id, config._id);
 
@@ -35,12 +35,12 @@ async function create(socket, { explicit, health }) {
     }
 }
 
-async function join(socket, { gameCode }) {
+async function join(socket, { gameCode, playerName }) {
     const game = await gameService.findGameByCode(gameCode);
     if (!game) throw new InvalidAttempt('Game was not found');
     if (game.player2) throw new InvalidAttempt('Game is full');
 
-    const player = await playerService.newPlayer(socket);
+    const player = await playerService.newPlayer(socket, playerName, game.config.health);
     game.player2 = player._id;
 
     await game.save();
@@ -98,7 +98,7 @@ async function startGame(socket, { gameId }) {
     }
 }
 
-async function playerDisconnect(socket, reason) {
+async function playerDisconnect(socket) {
     const player = await playerService.disconnectPlayer(socket.id);
     if (!player) throw new InvalidAttempt('Player does not exist')
 

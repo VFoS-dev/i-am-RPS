@@ -1,6 +1,13 @@
 const { Games } = require('../_helper/db')
 const { generateRandomCode } = require("../_helper/game")
 
+const populateAll = [
+    { path: 'player1', strictPopulate: false, populate: { path: 'iAm' } },
+    { path: 'player2', strictPopulate: false, populate: { path: 'iAm' } },
+    { path: "history", strictPopulate: false },
+    { path: "config", strictPopulate: false },
+]
+
 module.exports = {
     newGame,
     findGameByCode,
@@ -26,26 +33,11 @@ async function newGame(player1, configId, keyLength = 4, attempts = 0) {
 }
 
 async function findGameByCode(code) {
-    return await Games.findOne({ code }).populate([
-        {
-            path: 'player1', strictPopulate: false,
-            populate: { path: 'iAm' }
-        },
-        {
-            path: 'player2', strictPopulate: false,
-            populate: { path: 'iAm' }
-        },
-        { path: "history", strictPopulate: false }
-    ]);
+    return await Games.findOne({ code }).populate(populateAll);
 }
 
 async function getGameById(id) {
-    return await Games.findById(id).populate([
-        { path: 'player1', strictPopulate: false, populate: { path: 'iAm' } },
-        { path: 'player2', strictPopulate: false, populate: { path: 'iAm' } },
-        { path: "history", strictPopulate: false },
-        { path: "config", strictPopulate: false },
-    ]);
+    return await Games.findById(id).populate(populateAll);
 }
 
 async function getGameByPlayerId(playerId) {
@@ -54,10 +46,5 @@ async function getGameByPlayerId(playerId) {
             { "player1._id": playerId, "player1.disconnected": false },
             { "player2._id": playerId, "player2.disconnected": false }
         ]
-    }).populate([
-        { path: 'player1', strictPopulate: false, populate: { path: 'iAm' } },
-        { path: 'player2', strictPopulate: false, populate: { path: 'iAm' } },
-        { path: "history", strictPopulate: false },
-        { path: "config", strictPopulate: false },
-    ]);
+    }).populate(populateAll);
 }

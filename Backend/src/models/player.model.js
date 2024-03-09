@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const schema = new Schema({
+    playerName: { type: String, required: true },
     health: { type: Number, default: 100 },
     maxHealth: { type: Number, default: 100 },
     socketId: { type: String, required: true },
