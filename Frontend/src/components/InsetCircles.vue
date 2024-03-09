@@ -36,6 +36,7 @@ const styles = computed(() => {
     --gap: 5px;
     --size: 3rem;
     --border-color: white;
+    height: fit-content;
     background-color: var(--card-color);
     padding: 2rem;
     position: relative;
