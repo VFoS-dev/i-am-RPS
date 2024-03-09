@@ -10,13 +10,17 @@ const useGameDataStore = defineStore('gameData', {
             setTimeout(reconnect, 0)
             return JSON.parse(prevousGame)
         }
-        return { connection: {}, game: {} }
+        return { connection: {}, game: {}, images: [] }
     },
     actions: {
         clearAll() {
             this.connection = {}
             this.game = {}
+            this.images = []
             sessionStorage.removeItem(sName)
+        },
+        clearImages() {
+            this.images = []
         },
         setConnection(connection) {
             this.connection = { ...this.connection, ...connection, }
@@ -25,6 +29,9 @@ const useGameDataStore = defineStore('gameData', {
         setGame(game) {
             this.game = { ...this.game, ...game, }
             this.saveGame()
+        },
+        setImages({ images = [] }) {
+            this.images = [this.images, images].flat()
         },
         saveGame() {
             sessionStorage.setItem(sName, JSON.stringify({

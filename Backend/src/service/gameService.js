@@ -8,7 +8,7 @@ module.exports = {
     getGameByPlayerId,
 }
 
-async function newGame(player1, keyLength = 4, attempts = 0) {
+async function newGame(player1, configId, keyLength = 4, attempts = 0) {
     const code = generateRandomCode(keyLength)
     const existingGame = await Games.findOne({ code })
     if (attempts > 20) {
@@ -17,12 +17,12 @@ async function newGame(player1, keyLength = 4, attempts = 0) {
     }
 
     if (!existingGame) {
-        const game = new Games({ code, player1, });
+        const game = new Games({ code, player1, config: configId });
         await game.save();
         return game;
     }
 
-    return await newGame(player1, keyLength, attempts)
+    return await newGame(player1, configId, keyLength, attempts)
 }
 
 async function findGameByCode(code) {
@@ -41,15 +41,10 @@ async function findGameByCode(code) {
 
 async function getGameById(id) {
     return await Games.findById(id).populate([
-        {
-            path: 'player1', strictPopulate: false,
-            populate: { path: 'iAm' }
-        },
-        {
-            path: 'player2', strictPopulate: false,
-            populate: { path: 'iAm' }
-        },
-        { path: "history", strictPopulate: false }
+        { path: 'player1', strictPopulate: false, populate: { path: 'iAm' } },
+        { path: 'player2', strictPopulate: false, populate: { path: 'iAm' } },
+        { path: "history", strictPopulate: false },
+        { path: "config", strictPopulate: false },
     ]);
 }
 
@@ -60,14 +55,9 @@ async function getGameByPlayerId(playerId) {
             { "player2._id": playerId, "player2.disconnected": false }
         ]
     }).populate([
-        {
-            path: 'player1', strictPopulate: false,
-            populate: { path: 'iAm' }
-        },
-        {
-            path: 'player2', strictPopulate: false,
-            populate: { path: 'iAm' }
-        },
-        { path: "history", strictPopulate: false }
+        { path: 'player1', strictPopulate: false, populate: { path: 'iAm' } },
+        { path: 'player2', strictPopulate: false, populate: { path: 'iAm' } },
+        { path: "history", strictPopulate: false },
+        { path: "config", strictPopulate: false },
     ]);
 }

@@ -7,7 +7,10 @@ import { gameData } from '@/stores/gameData'
 const API = env('VITE_API', 'http://localhost:3000')
 const socket = io(API);
 
-socket.on('gameUpdated', gameData.setGame)
+socket.on('gameUpdated', (res) => {
+    gameData.setGame(res)
+    // reroute to game
+})
 socket.on('notify', modalData.add)
 socket.on('kickFromLobby', () => {
     gameData.clearAll()
@@ -15,18 +18,25 @@ socket.on('kickFromLobby', () => {
 })
 
 export async function checkConnection() {
-    try { await (await fetch(API)).json() }
-    catch (error) { modalData.push('Unable to connect to server', 'Server Error') }
+    try {
+        await fetch(API)
+    } catch (error) {
+        modalData.push('Unable to connect to server', 'Server Error')
+    }
 }
 
 export async function reconnect() {
     socket.emit('game_reconnect', gameData.connection, handleAPI({
-        onError: modalData.add,
+        onError: (res) => {
+            modalData.add(res)
+            gameData.clearAll()
+            // reroute to home
+        }
     }))
 }
 
-export async function gameCreate() {
-    socket.emit('game_create', {}, handleAPI({
+export async function gameCreate(health, explicit) {
+    socket.emit('game_create', { health, explicit }, handleAPI({
         onError: modalData.add,
         onSuccess: gameData.setConnection,
     }))
@@ -61,7 +71,8 @@ export async function startGame() {
 }
 
 export async function googleImageSearch() {
-    socket.emit('google_imageSearch', {}, handleAPI({
+    socket.emit('google_imageSearch', { gameId }, handleAPI({
         onError: modalData.add,
+        onSuccess: gameData.setImages
     }))
 }

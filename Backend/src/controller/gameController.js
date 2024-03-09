@@ -3,6 +3,7 @@ const { gameStates } = require('../_helper/game');
 const gameService = require('../service/gameService');
 const playerService = require('../service/playerService');
 const iAmService = require('../service/iAmService');
+const configService = require('../service/configService')
 const { AbeatsB } = require('../service/openai');
 const { addHistory } = require('../service/historyService');
 
@@ -16,9 +17,10 @@ module.exports = {
     playerReconnect
 }
 
-async function create(socket) {
+async function create(socket, { explicit, health }) {
     const player = await playerService.newPlayer(socket);
-    const game = await gameService.newGame(player._id);
+    const config = await configService.addConfig(health, explicit)
+    const game = await gameService.newGame(player._id, config._id);
 
     socket.join(game.code);
 

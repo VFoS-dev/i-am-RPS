@@ -8,6 +8,7 @@ const schema = new Schema({
     history: [{ type: Schema.Types.ObjectId, ref: 'history' }],
     player1: { type: Schema.Types.ObjectId, ref: 'player', required: true },
     player2: { type: Schema.Types.ObjectId, ref: 'player' },
+    config: { type: Schema.Types.ObjectId, ref: 'config' }
 });
 
 schema.set('toJSON', { virtuals: true });
