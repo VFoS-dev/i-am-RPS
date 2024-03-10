@@ -2,7 +2,8 @@ const { IAm } = require('../_helper/db')
 
 module.exports = {
     newIAm,
-    clearIAm
+    clearIAm,
+    removeIAmById,
 }
 
 async function newIAm(player, prompt, image) {
@@ -21,4 +22,8 @@ async function clearIAm(iAmId) {
     iAm.prompt = ''
     iAm.image = ''
     await iAm.save();
+}
+
+async function removeIAmById(iAmId) {
+    await IAm.deleteOne({ _id: iAmId })
 }

@@ -14,4 +14,5 @@ module.exports = {
   IAm: require('../models/iAm.model'),
   History: require('../models/history.model'),
   Player: require('../models/player.model'),
+  Config: require('../models/config.model'),
 };

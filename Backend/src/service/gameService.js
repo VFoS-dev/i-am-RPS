@@ -1,5 +1,8 @@
 const { Games } = require('../_helper/db')
 const { generateRandomCode } = require("../_helper/game")
+const historyService = require('./historyService')
+const playerService = require('./playerService')
+const configService = require('./configService')
 
 const populateAll = [
     { path: 'player1', strictPopulate: false, populate: { path: 'iAm' } },
@@ -13,6 +16,7 @@ module.exports = {
     findGameByCode,
     getGameById,
     getGameByPlayerId,
+    removeGame,
 }
 
 async function newGame(player1, configId, keyLength = 4, attempts = 0) {
@@ -47,4 +51,18 @@ async function getGameByPlayerId(playerId) {
             { "player2._id": playerId, "player2.disconnected": false }
         ]
     }).populate(populateAll);
+}
+
+async function removeGame(gameId) {
+    const game = await getGameById(gameId)
+    if (!game) return
+    if (game.history)
+        await historyService.removeHistoryByIds(game.history.map(a => a._id))
+    if (game.player1)
+        await playerService.removePlayerById(game.player1.id)
+    if (game.player2)
+        await playerService.removePlayerById(game.player2.id)
+    if (game.config)
+        await configService.removeConfigById(game.config.id)
+    await game.remove()
 }

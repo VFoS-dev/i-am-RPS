@@ -20,6 +20,7 @@ import InsetCircles from '@/components/InsetCircles.vue'
 import LabelInput from '@/components/LabelInput.vue'
 import Button from '@/components/Button.vue'
 import { ref } from 'vue'
+import { gameJoin } from '@/service/api-service'
 
 const values = ref({
     playerName: '',
@@ -32,8 +33,9 @@ function handleChange({ target: { id, value } }) {
 
 function handleSubmit(e) {
     e.preventDefault();
+    const { gameCode, playerName } = values.value
 
-    console.log(e);
+    gameJoin(gameCode, playerName)
 }
 </script>
 

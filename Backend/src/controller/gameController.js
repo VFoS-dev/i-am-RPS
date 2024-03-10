@@ -14,7 +14,7 @@ module.exports = {
     iAm,
     startGame,
     playerDisconnect,
-    playerReconnect
+    playerReconnect,
 }
 
 async function create(socket, { explicit, playerName, health }) {
@@ -106,8 +106,10 @@ async function playerDisconnect(socket) {
     if (!game) throw new InvalidAttempt('Game does not exist')
 
     if ((!game.player1 || game.player1.disconnected) && (!game.player2 || game.player2.disconnected)) {
-        await game.remove()
+        await gameService.removeGame(game._id);
     }
+
+    updateLobby(socket, game._id);
 
     return {
         success: true
@@ -126,7 +128,8 @@ async function playerReconnect(socket, { socketId, player, gameCode }) {
     updateLobby(socket, game._id);
 
     return {
-        success: true
+        success: true,
+        socketId: socket.id,
     }
 }
 

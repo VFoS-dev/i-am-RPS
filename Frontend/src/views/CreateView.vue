@@ -22,6 +22,7 @@ import LabelInput from '@/components/LabelInput.vue'
 import LabelCheckbox from '@/components/LabelCheckbox.vue'
 import Button from '@/components/Button.vue'
 import { ref } from 'vue'
+import { gameCreate } from '@/service/api-service'
 
 const values = ref({
     playerName: '',
@@ -39,8 +40,9 @@ function handleChange({ target: { id, value } }) {
 
 function handleSubmit(e) {
     e.preventDefault();
+    const { health, explicit, playerName } = values.value
 
-    console.log(e);
+    gameCreate(health, explicit, playerName)
 }
 </script>
 

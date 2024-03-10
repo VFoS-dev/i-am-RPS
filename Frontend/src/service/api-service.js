@@ -27,23 +27,24 @@ export async function checkConnection() {
 
 export async function reconnect() {
     socket.emit('game_reconnect', gameData.connection, handleAPI({
+        onSuccess: gameData.setConnection,
         onError: (res) => {
             modalData.add(res)
             gameData.clearAll()
             // reroute to home
-        }
+        },
     }))
 }
 
-export async function gameCreate(health, explicit) {
-    socket.emit('game_create', { health, explicit }, handleAPI({
+export async function gameCreate(health, explicit, playerName) {
+    socket.emit('game_create', { health, explicit, playerName }, handleAPI({
         onError: modalData.add,
         onSuccess: gameData.setConnection,
     }))
 }
 
-export async function gameJoin(gameCode) {
-    socket.emit('game_join', { gameCode }, handleAPI({
+export async function gameJoin(gameCode, playerName) {
+    socket.emit('game_join', { gameCode, playerName }, handleAPI({
         onError: modalData.add,
         onSuccess: gameData.setConnection,
     }))

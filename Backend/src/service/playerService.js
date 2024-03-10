@@ -1,5 +1,6 @@
 const { Player, IAm } = require('../_helper/db');
 const { InvalidAttempt } = require('../_helper/error');
+const iAmService = require('./iAmService')
 
 module.exports = {
     newPlayer,
@@ -8,6 +9,7 @@ module.exports = {
     damagePlayer,
     disconnectPlayer,
     updateSocketId,
+    removePlayerById,
 }
 
 async function newPlayer(socket, playerName, health) {
@@ -57,4 +59,12 @@ async function disconnectPlayer(socketId) {
 
 async function updateSocketId(playerId, socketId) {
     await Player.updateOne({ _id: playerId }, { socketId, disconnected: false })
+}
+
+async function removePlayerById(playerId) {
+    const player = await getPlayerById(playerId)
+    if (!player) return
+    if (player.iAm)
+        await iAmService.removeIAmById(player.iAm._id)
+    await player.remove()
 }
