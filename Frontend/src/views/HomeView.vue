@@ -1,14 +1,14 @@
 <template>
     <div class="container">
-        <JoinView />
+        <JoinModal />
         <IAm />
-        <CreateView />
+        <CreateModal />
     </div>
 </template>
 
 <script setup>
-import JoinView from './JoinView.vue';
-import CreateView from './CreateView.vue';
+import JoinModal from '@/components/JoinModal.vue';
+import CreateModal from '@/components/CreateModal.vue';
 import IAm from '@/components/IAm.vue';
 </script>
 

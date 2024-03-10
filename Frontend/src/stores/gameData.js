@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import pinia from './piniaInstance';
 import { reconnect } from '@/service/api-service';
+import router from '@/router';
 
 const sName = 'PRSgame'
 const useGameDataStore = defineStore('gameData', {
@@ -18,6 +19,7 @@ const useGameDataStore = defineStore('gameData', {
             this.game = {}
             this.images = []
             sessionStorage.removeItem(sName)
+            router.push({ name: 'home' })
         },
         clearImages() {
             this.images = []
@@ -29,6 +31,7 @@ const useGameDataStore = defineStore('gameData', {
         setGame(game) {
             this.game = { ...this.game, ...game, }
             this.saveGame()
+            router.push({ name: 'game' })
         },
         setImages({ images = [] }) {
             this.images = [this.images, images].flat()

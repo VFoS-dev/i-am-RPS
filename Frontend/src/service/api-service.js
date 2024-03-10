@@ -7,10 +7,7 @@ import { gameData } from '@/stores/gameData'
 const API = env('VITE_API', 'http://localhost:3000')
 const socket = io(API);
 
-socket.on('gameUpdated', (res) => {
-    gameData.setGame(res)
-    // reroute to game
-})
+socket.on('gameUpdated', gameData.setGame)
 socket.on('notify', modalData.add)
 socket.on('kickFromLobby', () => {
     gameData.clearAll()
@@ -31,7 +28,6 @@ export async function reconnect() {
         onError: (res) => {
             modalData.add(res)
             gameData.clearAll()
-            // reroute to home
         },
     }))
 }
