@@ -10,7 +10,7 @@ async function imageSearch(socket, { gameId, query, page = 0 }) {
     const game = await gameService.getGameById(gameId)
     if (!game) new InvalidAttempt('Game was not found')
 
-    const images = googleService.ImageSearch(query, { page, explicit: game.config.explicit })
+    const images = await googleService.ImageSearch(query, { page, explicit: game.config.explicit })
 
     return {
         success: true,

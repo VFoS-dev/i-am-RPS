@@ -64,5 +64,5 @@ async function removeGame(gameId) {
         await playerService.removePlayerById(game.player2.id)
     if (game.config)
         await configService.removeConfigById(game.config.id)
-    await game.remove()
+    await Games.deleteOne({ _id: gameId })
 }

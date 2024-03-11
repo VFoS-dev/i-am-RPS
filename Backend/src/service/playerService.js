@@ -42,7 +42,6 @@ async function getPlayerById(playerId) {
 async function damagePlayer(playerId, damage = 1) {
     const player = await getPlayerById(playerId)
     if (!player) throw new InvalidAttempt('Player not found')
-
     player.health = Math.max(0, player.health - parseFloat(damage))
     await player.save();
 
@@ -67,7 +66,7 @@ async function removePlayerById(playerId) {
     if (!player) return
     if (player.iAm)
         await iAmService.removeIAmById(player.iAm._id)
-    await player.remove()
+    await Player.deleteOne({ _id: playerId })
 }
 
 async function changeDefaultPlayer(playerId) {

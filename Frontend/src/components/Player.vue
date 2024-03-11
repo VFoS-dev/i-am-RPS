@@ -13,9 +13,11 @@
                 <h1> {{ player.playerName }} </h1>
             </div>
         </div>
-        <div class="player-image">
-            <button @click="kickPlayer" class="image-buttons opponent lobby-only host-only">Kick Player</button>
-            <button @click="swapCharacter" class="image-buttons yours lobby-only">Swap Image</button>
+        <div class="player-image" :class="{ hasImage: player.iAm?.image }">
+            <button v-if="playerActive" @click="kickPlayer" class="image-buttons opponent lobby-only host-only">Kick
+                Player</button>
+            <button v-if="playerActive" @click="swapCharacter" class="image-buttons yours lobby-only">Swap
+                Image</button>
             <img :src="selectedImage" />
         </div>
     </div>
@@ -41,10 +43,11 @@ const healthPercent = computed(() => {
     const { health, maxHealth } = player.value
     return 100 * health / maxHealth
 })
+
 const selectedImage = computed(() => {
     if (!playerActive.value) return
 
-    if (player.value.iAm?.image) return player.iAm.image
+    if (player.value.iAm?.image) return player.value.iAm.image
 
     return `/images/players/${player.value?.defaultImage ?? playerIcon}.png`
 })
@@ -71,12 +74,11 @@ function swapCharacter() {
     &.left {
         border-right: 1px solid black;
 
-        .player-image {
+        .player-image:not(.hasImage) {
             img {
                 scale: -1 1;
                 transform: translate(50%, -50%);
             }
-
         }
 
         .health-container,
@@ -105,6 +107,7 @@ function swapCharacter() {
 }
 
 .player-iAm {
+    z-index: 1;
     position: absolute;
     width: 100%;
     top: 10%;

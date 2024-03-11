@@ -7,7 +7,7 @@ module.exports = {
 }
 
 async function newIAm(player, prompt, image) {
-    var iAm = player.iAm ? await IAm.findById(player.iAm) : new IAm()
+    var iAm = player.iAm ? await IAm.findById(player.iAm._id) : new IAm()
 
     iAm.prompt = prompt;
     iAm.image = image;
@@ -19,6 +19,7 @@ async function newIAm(player, prompt, image) {
 
 async function clearIAm(iAmId) {
     const iAm = await IAm.findById(iAmId)
+    if (!iAm) return
     iAm.prompt = ''
     iAm.image = ''
     await iAm.save();

@@ -22,7 +22,7 @@ async function ImageSearch(searchString, { explicit = false, page = 0 } = {}) {
         url.searchParams.append(key, value);
     }
 
-    const data = await (await fetch(url.toString())).json();
+    const data = await fetch(url.toString()).then(a => a.json());
 
     let items = []
     for (const { link } of data.items) {

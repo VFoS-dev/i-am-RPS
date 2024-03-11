@@ -77,8 +77,9 @@ export async function startGame() {
     }))
 }
 
-export async function googleImageSearch() {
-    socket.emit('google_imageSearch', { gameId }, handleAPI({
+export async function googleImageSearch(query) {
+    const gameId = gameData.game?.id
+    socket.emit('google_imageSearch', { gameId, query }, handleAPI({
         onError: modalData.add,
         onSuccess: gameData.setImages
     }))

@@ -149,10 +149,13 @@ async function iAm(socket, { gameId, prompt, image }) {
 
     const player = await playerService.getPlayerById(game[playerTurn]._id);
 
-    await iAmService.newIAm(player, prompt, image)
+    const iAm = await iAmService.newIAm(player, prompt, image)
+    player.iAm = iAm.id
+
+    await player.save()
 
     updateLobby(socket, game._id)
-    setTimeout(roundEnd, 3000, socket, { gameId })
+    setTimeout(roundEnd, 1000, socket, { gameId })
 
     return {
         success: true
@@ -164,7 +167,6 @@ async function roundEnd(socket, { gameId }) {
     if (!game) throw new InvalidAttempt('Game was not found');
     if (game.state === gameStates.lobby) throw new InvalidAttempt('Game has not started')
     if (game.state === gameStates.results) throw new InvalidAttempt('Game has ended')
-
     const check = {
         [gameStates.turn_player1]: {
             A: 'player1', B: 'player2',
@@ -174,12 +176,15 @@ async function roundEnd(socket, { gameId }) {
         },
     }[game.state]
 
-    game.state = gameStates.roundEnd;
-    await game.save()
-
     if (game.player1.iAm?.prompt && game.player2.iAm?.prompt) {
-        AbeatsB(check.A, check.B).then((info) => handleResult(socket, gameId, info, check))
+        game.state = gameStates.roundEnd;
+        AbeatsB(game[check.A].iAm.prompt, game[check.B].iAm.prompt)
+            .then((info) => handleResult(socket, gameId, info, check))
+    } else {
+        game.state = gameStates[`turn_${check.B}`]
     }
+
+    await game.save()
 
     updateLobby(socket, gameId)
 
@@ -188,19 +193,34 @@ async function roundEnd(socket, { gameId }) {
     }
 }
 
-async function handleResult(socket, gameId, { error, reason, answer }, { A: playerA, B: playerB }) {
+async function handleResult(socket, gameId, { error, reason, equals, answer }, { A: playerA, B: playerB }) {
     const game = await gameService.getGameById(gameId);
     if (!game) throw new InvalidAttempt('Game was not found');
 
     if (error) {
         game.state = gameStates[`turn_${playerA}`]
-        await iAmService.clearIAm(game[playerA].iAm)
+        await iAmService.clearIAm(game[playerA].iAm.id)
+
         await game.save()
 
         updateLobby(socket, gameId)
-        notifyPlayer(socket, gameId, reason)
+        notifyPlayer(socket, socket.id, { message: reason, title: 'Error with your Selection', andSelf: true })
 
         return { error, reason }
+    }
+
+    if (equals) {
+        game.state = gameStates[`turn_${playerA}`]
+        await iAmService.clearIAm(game[playerA].iAm.id)
+        await iAmService.clearIAm(game[playerB].iAm.id)
+
+        await game.save()
+
+        updateLobby(socket, gameId)
+        notifyPlayer(socket, game[playerA].socketId, { message: reason, title: 'Characters are Equals', andSelf: true })
+        notifyPlayer(socket, game[playerB].socketId, { message: reason, title: 'Characters are Equals', andSelf: true })
+
+        return { equals, reason }
     }
 
     const { focusPlayer, wonPlayer } = {
@@ -208,11 +228,11 @@ async function handleResult(socket, gameId, { error, reason, answer }, { A: play
         0: { focusPlayer: playerA, wonPlayer: playerB, },
     }[+answer]
 
-    const history = addHistory(game.player1.iAm.prompt, game.player2.iAm.prompt, wonPlayer, reason)
-    game.history.push(history.id)
+    const history = await addHistory(game.player1.iAm.prompt, game.player2.iAm.prompt, wonPlayer, reason)
+    game.history = [history.id, ...(game.history ?? [])]
 
     const player = await playerService.damagePlayer(game[focusPlayer].id)
-    await iAmService.clearIAm(game[focusPlayer].id)
+    await iAmService.clearIAm(game[focusPlayer].iAm.id)
 
     if (!player.health) {
         game.state = gameStates.results
@@ -222,6 +242,10 @@ async function handleResult(socket, gameId, { error, reason, answer }, { A: play
 
     await game.save();
     updateLobby(socket, gameId)
+
+    if (!player.health) {
+        gameService.removeGame(game.id)
+    }
 
     return {
         success: true
@@ -235,8 +259,11 @@ async function updateLobby(socket, gameId) {
     socket.emit("gameUpdated", game);
 }
 
-async function notifyPlayer(socket, socketId, message, title = 'Announcement') {
+async function notifyPlayer(socket, socketId, { message, title = 'Announcement', andSelf = false }) {
     socket.to(socketId).emit('notify', { message, title })
+    if (andSelf) {
+        socket.emit('notify', { message, title })
+    }
 }
 
 async function defaultImage(socket, { gameId, player }) {
