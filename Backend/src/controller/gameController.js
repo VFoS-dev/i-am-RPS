@@ -13,17 +13,18 @@ module.exports = {
     kickPlayer,
     iAm,
     startGame,
+    leaveLobby,
     playerDisconnect,
     playerReconnect,
+    defaultImage,
 }
 
 async function create(socket, { explicit, playerName, health }) {
     const player = await playerService.newPlayer(socket, playerName, health);
-    const config = await configService.addConfig(health, explicit)
+    const config = await configService.addConfig(health, explicit);
     const game = await gameService.newGame(player._id, config._id);
 
     socket.join(game.code);
-
     updateLobby(socket, game._id);
 
     return {
@@ -44,8 +45,7 @@ async function join(socket, { gameCode, playerName }) {
     game.player2 = player._id;
 
     await game.save();
-
-    socket.join(game.code);
+    await socket.join(game.code);
 
     updateLobby(socket, game._id);
 
@@ -58,18 +58,17 @@ async function join(socket, { gameCode, playerName }) {
     }
 }
 
-async function kickPlayer(socket, { gameId, playerId }) {
+async function kickPlayer(socket, { gameId, playerSocketId }) {
     const game = await gameService.getGameById(gameId);
     if (!game) throw new InvalidAttempt('Game was not found');
     if (game.state !== gameStates.lobby) throw new InvalidAttempt('You can only kick players while the game is in the lobby');
-    if (socket.id !== game.player1.id) throw new InvalidAttempt('You are not the game host');
-    if (game.player2?.id !== playerId) throw new InvalidAttempt('That Player is no longer in the game');
+    if (socket.id !== game.player1.socketId) throw new InvalidAttempt('You are not the game host');
+    if (game.player2?.socketId !== playerSocketId) throw new InvalidAttempt('That Player is no longer in the game');
 
     const player = await playerService.getPlayerById(game.player2.id);
     game.player2 = null;
 
-    socket.leave(game.code)
-    socket.to(player.socketId).emit("kickFromLobby")
+    await socket.to(player.socketId).emit("kickFromLobby")
 
     await game.save();
     await playerService.deletePlayer(player.id);
@@ -87,7 +86,7 @@ async function startGame(socket, { gameId }) {
     if (game.state !== gameStates.lobby) throw new InvalidAttempt('Game has already started')
     if (!game.player1 || !game.player2) throw new InvalidAttempt('Missing a player')
 
-    const playerTurn = 'turn_player' + Math.round(Math.random()) + 1;
+    const playerTurn = 'turn_player' + Math.ceil(Math.random() * 2);
     game.state = gameStates[playerTurn];
 
     await game.save();
@@ -120,6 +119,7 @@ async function playerReconnect(socket, { socketId, player, gameCode }) {
     const game = await gameService.findGameByCode(gameCode)
     if (!game) throw new InvalidAttempt('Game no longer exists')
     const _player = game[`player${player}`]
+    if (!_player) return { success: true } // player was kicked :P
     if (_player.socketId !== socketId) throw new InvalidAttempt('Previous player signiture does not match')
 
     await playerService.updateSocketId(_player.id, socket.id)
@@ -237,4 +237,28 @@ async function updateLobby(socket, gameId) {
 
 async function notifyPlayer(socket, socketId, message, title = 'Announcement') {
     socket.to(socketId).emit('notify', { message, title })
+}
+
+async function defaultImage(socket, { gameId, player }) {
+    const game = await gameService.getGameById(gameId)
+    if (!game) throw new InvalidAttempt('Game no longer exists')
+
+    await playerService.changeDefaultPlayer(game[`player${player}`]._id)
+
+    updateLobby(socket, game.id)
+
+    return {
+        success: true
+    }
+}
+
+async function leaveLobby(socket, { gameId }) {
+    const game = await gameService.getGameById(gameId)
+    if (!game) throw new InvalidAttempt('Game no longer exists')
+
+    await socket.leave(game.code)
+
+    return {
+        success: true
+    }
 }

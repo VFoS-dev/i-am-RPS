@@ -13,7 +13,8 @@ module.exports = (socket) => new Proxy(modules, {
         get: (target, key) => (data, callback = fn) => {
             log(`- - Socket: ${socket.id} - - Call: ${_key}.${key}`)
             target[key](socket, data)
-                .then(callback).catch((e) => callback(errorHandler(e)))
+                .then(callback).catch((e) => typeof callback == 'function' && callback(errorHandler(e))
+                )
         }
     })
 })

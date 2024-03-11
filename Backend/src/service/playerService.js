@@ -10,6 +10,7 @@ module.exports = {
     disconnectPlayer,
     updateSocketId,
     removePlayerById,
+    changeDefaultPlayer,
 }
 
 async function newPlayer(socket, playerName, health) {
@@ -29,7 +30,7 @@ async function deletePlayer(playerId) {
         }
     }
 
-    await player.remove()
+    await Player.deleteOne({ _id: playerId })
 }
 
 async function getPlayerById(playerId) {
@@ -67,4 +68,12 @@ async function removePlayerById(playerId) {
     if (player.iAm)
         await iAmService.removeIAmById(player.iAm._id)
     await player.remove()
+}
+
+async function changeDefaultPlayer(playerId) {
+    const player = await getPlayerById(playerId)
+    let numbers = new Set([...new Array(12)].map((a, i) => i + 1))
+    numbers.delete(player.defaultImage)
+    numbers = [...numbers]
+    await Player.updateOne({ _id: playerId }, { defaultImage: numbers[Math.floor(numbers.length * Math.random())] })
 }

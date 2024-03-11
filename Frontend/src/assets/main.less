@@ -22,3 +22,65 @@ label {
 button {
     cursor: pointer;
 }
+
+.temp {
+    top: 0;
+    position: absolute;
+}
+
+.player1 {
+    .player.player1 .opponent {
+        display: none;
+    }
+
+    .player.player2 .yours {
+        display: none;
+    }
+}
+
+.player2 {
+    .player.player2 .opponent {
+        display: none;
+    }
+
+    .player.player1 .yours {
+        display: none;
+    }
+}
+
+.game-container {
+    &:not(.player1) .host-only {
+        display: none;
+    }
+
+    &:not(.lobby) .lobby-only {
+        display: none;
+    }
+
+    &:not(.turn_player2).player2 .your-turn,
+    &:not(.turn_player1).player1 .your-turn {
+        display: none;
+    }
+
+    &:not(.results) {
+        &:not(.player1) {
+
+            .player.player1 .results-only.yours,
+            .player.player2 .results-only.opponent {
+                display: none;
+            }
+        }
+
+        &:not(.player2) {
+
+            .player.player1 .results-only.opponent,
+            .player.player2 .results-only.yours {
+                display: none;
+            }
+        }
+
+        .results-only {
+            display: none;
+        }
+    }
+}

@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 
 const schema = new Schema({
     playerName: { type: String, required: true },
+    defaultImage: { type: Number, default: Math.ceil(Math.random() * 12) },
     health: { type: Number, default: 100 },
     maxHealth: { type: Number, default: 100 },
     socketId: { type: String, required: true },

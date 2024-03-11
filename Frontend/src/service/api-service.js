@@ -10,8 +10,12 @@ const socket = io(API);
 socket.on('gameUpdated', gameData.setGame)
 socket.on('notify', modalData.add)
 socket.on('kickFromLobby', () => {
-    gameData.clearAll()
-    modalData.push('Kicked from lobby', 'Alert')
+    socket.emit('game_leave', gameData.connection, handleAPI({
+        onSuccess: () => {
+            gameData.clearAll()
+            modalData.push('Kicked from lobby', 'Alert')
+        }
+    }))
 })
 
 export async function checkConnection() {
@@ -20,6 +24,12 @@ export async function checkConnection() {
     } catch (error) {
         modalData.push('Unable to connect to server', 'Server Error')
     }
+}
+
+export async function changeDefaultImage() {
+    socket.emit('game_defaultImage', gameData.connection, handleAPI({
+        onError: modalData.add,
+    }))
 }
 
 export async function reconnect() {
@@ -46,9 +56,9 @@ export async function gameJoin(gameCode, playerName) {
     }))
 }
 
-export async function gameKickPlayer(playerId) {
+export async function gameKickPlayer(playerSocketId) {
     const gameId = gameData.game?.id
-    socket.emit('game_kickPlayer', { gameId, playerId }, handleAPI({
+    socket.emit('game_kickPlayer', { gameId, playerSocketId }, handleAPI({
         onError: modalData.add,
     }))
 }

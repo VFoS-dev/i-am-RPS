@@ -11,7 +11,8 @@ const useModalDataStore = defineStore('modalData', {
             this.push(message, title)
         },
         remove() {
-            this.modals = this.modals.shift()
+            const [d, ...modals] = this.modals ?? [];
+            this.modals = modals
         }
     }
 });

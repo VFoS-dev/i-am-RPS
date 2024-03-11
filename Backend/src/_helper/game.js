@@ -1,7 +1,7 @@
 const gameStates = {
     lobby: "lobby",
-    turn_player1: "turn:player1",
-    turn_player2: "turn:player2",
+    turn_player1: "turn_player1",
+    turn_player2: "turn_player2",
     roundEnd: 'roundEnd',
     results: "results",
 }

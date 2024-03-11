@@ -11,7 +11,7 @@ const useGameDataStore = defineStore('gameData', {
             setTimeout(reconnect, 0)
             return JSON.parse(prevousGame)
         }
-        return { connection: {}, game: {}, images: [] }
+        return { connection: {}, game: {}, images: [], }
     },
     actions: {
         clearAll() {
