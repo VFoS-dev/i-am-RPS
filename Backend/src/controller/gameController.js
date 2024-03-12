@@ -204,7 +204,7 @@ async function handleResult(socket, gameId, { error, reason, equals, answer }, {
         await game.save()
 
         updateLobby(socket, gameId)
-        notifyPlayer(socket, socket.id, { message: reason, title: 'Error with your Selection', andSelf: true })
+        notifyPlayer(socket, socket.id, gameCode, { message: reason, title: 'Error with your Selection' })
 
         return { error, reason }
     }
@@ -217,8 +217,7 @@ async function handleResult(socket, gameId, { error, reason, equals, answer }, {
         await game.save()
 
         updateLobby(socket, gameId)
-        notifyPlayer(socket, game[playerA].socketId, { message: reason, title: 'Characters are Equals', andSelf: true })
-        notifyPlayer(socket, game[playerB].socketId, { message: reason, title: 'Characters are Equals', andSelf: true })
+        notifyPlayer(socket, game[playerA].socketId, gameCode, { message: reason, title: 'Characters are Equals', andLobby: true })
 
         return { equals, reason }
     }
@@ -252,17 +251,21 @@ async function handleResult(socket, gameId, { error, reason, equals, answer }, {
     }
 }
 
-async function updateLobby(socket, gameId) {
+async function updateLobby(socket, gameId, kicked = false) {
     const game = await gameService.getGameById(gameId);
 
     socket.to(game.code).emit("gameUpdated", game);
-    socket.emit("gameUpdated", game);
+    if (!kicked) socket.emit("gameUpdated", game);
 }
 
-async function notifyPlayer(socket, socketId, { message, title = 'Announcement', andSelf = false }) {
-    socket.to(socketId).emit('notify', { message, title })
-    if (andSelf) {
+async function notifyPlayer(socket, socketId, gameCode, { message, title = 'Announcement', andLobby = false }) {
+    if (socketId === socket.id) {
         socket.emit('notify', { message, title })
+    } else {
+        socket.to(socketId).emit('notify', { message, title })
+    }
+    if (andLobby) {
+        socket.to(gameCode).emit('notify', { message, title })
     }
 }
 
@@ -270,20 +273,41 @@ async function defaultImage(socket, { gameId, player }) {
     const game = await gameService.getGameById(gameId)
     if (!game) throw new InvalidAttempt('Game no longer exists')
 
-    await playerService.changeDefaultPlayer(game[`player${player}`]._id)
+    const defaultImage = await playerService.changeDefaultPlayer(game[`player${player}`]._id)
 
     updateLobby(socket, game.id)
+
+    return {
+        success: true,
+        defaultImage
+    }
+}
+
+async function leaveLobby(socket, { gameId, left = false }) {
+    const game = await gameService.getGameById(gameId)
+    if (!game) throw new InvalidAttempt('Game no longer exists')
+
+    if (left) await playerService.disconnectPlayer(socket.id)
+
+    await socket.leave(game.code)
+
+    validateGame(game.id)
+
+    updateLobby(socket, game.id, true)
 
     return {
         success: true
     }
 }
 
-async function leaveLobby(socket, { gameId }) {
+async function validateGame(gameId) {
     const game = await gameService.getGameById(gameId)
     if (!game) throw new InvalidAttempt('Game no longer exists')
 
-    await socket.leave(game.code)
+    if ((!game.player1 || game.player1?.disconnected) &&
+        (!game.player2 || game.player2?.disconnected)) {
+        await gameService.removeGame(gameId)
+    }
 
     return {
         success: true

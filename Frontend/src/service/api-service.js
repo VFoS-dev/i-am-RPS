@@ -28,6 +28,7 @@ export async function checkConnection() {
 
 export async function changeDefaultImage() {
     socket.emit('game_defaultImage', gameData.connection, handleAPI({
+        onSuccess: gameData.changeDefaultImage,
         onError: modalData.add,
     }))
 }
@@ -82,5 +83,13 @@ export async function googleImageSearch(query) {
     socket.emit('google_imageSearch', { gameId, query }, handleAPI({
         onError: modalData.add,
         onSuccess: gameData.setImages
+    }))
+}
+
+export async function leaveGame() {
+    const gameId = gameData.game?.id
+    socket.emit('game_leave', { gameId, left: true }, handleAPI({
+        onError: modalData.add,
+        onSuccess: gameData.clearAll
     }))
 }

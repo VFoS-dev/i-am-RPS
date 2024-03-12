@@ -71,8 +71,13 @@ async function removePlayerById(playerId) {
 
 async function changeDefaultPlayer(playerId) {
     const player = await getPlayerById(playerId)
+
     let numbers = new Set([...new Array(12)].map((a, i) => i + 1))
     numbers.delete(player.defaultImage)
     numbers = [...numbers]
-    await Player.updateOne({ _id: playerId }, { defaultImage: numbers[Math.floor(numbers.length * Math.random())] })
+
+    const selected = numbers[Math.floor(numbers.length * Math.random())]
+    await Player.updateOne({ _id: playerId }, { defaultImage: selected })
+
+    return selected
 }

@@ -32,7 +32,7 @@ const styles = computed(() => {
 
 <style scoped lang="less">
 .decor-container {
-    --card-color: gray;
+    --card-color: white;
     --gap: 5px;
     --size: 3rem;
     --border-color: white;

@@ -15,6 +15,7 @@ const useGameDataStore = defineStore('gameData', {
     },
     actions: {
         clearAll() {
+            console.log('here');
             this.connection = {}
             this.game = {}
             this.images = []
@@ -29,6 +30,9 @@ const useGameDataStore = defineStore('gameData', {
             this.saveGame()
         },
         setGame(game) {
+            if (!Object.keys(this.connection).length) {
+                return
+            }
             this.game = { ...this.game, ...game, }
             this.saveGame()
             router.push({ name: 'game' })
@@ -42,6 +46,10 @@ const useGameDataStore = defineStore('gameData', {
                 game: this.game
             }))
         },
+        changeDefaultImage({ defaultImage }) {
+            const player = `player${this.connection.player}`
+            this.game[player].defaultImage = defaultImage
+        }
     }
 });
 

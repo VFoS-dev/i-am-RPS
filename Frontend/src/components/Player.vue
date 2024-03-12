@@ -1,23 +1,21 @@
 <template>
-    <div class="player" :class="[{ left: 1 == props.playerId }, `player${props.playerId}`]">
-        <div class="temp">
-            {{ player }}
-            <br />
-            {{ gameData.game.code }}
-        </div>
+    <div class="player"
+        :class="[{ left: 1 == props.playerNumber, disconnected: playerDisconnected }, `player${props.playerNumber}`]">
         <div v-if="playerActive" class="player-iAm">
             <p v-if="player.iAm?.prompt">I am: <strong>{{ player.iAm?.prompt }}</strong></p>
         </div>
-        <div v-if="playerActive" class="player-health">
-            <div class="health-container" :style="`--width:${healthPercent}%;`">
-                <h1> {{ player.playerName }} </h1>
+        <div class="player-health">
+            <PlayerHealth :maxHealth="player.maxHealth" :health="player.health" :playerActive="playerActive">
+                {{ player.playerName }}
+            </PlayerHealth>
+            <div class="player-options" v-if="playerActive">
+                <ImageButtons v-if="isHost && gameState.lobby && !isYou" svg="kick" @onClick="kickPlayer" />
+                <ImageButtons v-if="isYou" svg="swap" @onClick="changeDefaultImage" />
+                <ImageButtons v-if="isYou" svg="leave" @onClick="leaveGame" />
             </div>
         </div>
         <div class="player-image" :class="{ hasImage: player.iAm?.image }">
-            <button v-if="playerActive" @click="kickPlayer" class="image-buttons opponent lobby-only host-only">Kick
-                Player</button>
-            <button v-if="playerActive" @click="swapCharacter" class="image-buttons yours lobby-only">Swap
-                Image</button>
+            <GameCode v-if="!playerActive" :code="gameData.game?.code" />
             <img :src="selectedImage" />
         </div>
     </div>
@@ -26,22 +24,46 @@
 <script setup>
 import { computed, ref } from 'vue';
 import { gameData } from '@/stores/gameData';
+import { changeDefaultImage, gameKickPlayer, leaveGame } from '@/service/api-service'
+import ImageButtons from '@/components/ImageButtons.vue'
+import PlayerHealth from '@/components/PlayerHealth.vue'
+import GameCode from '@/components/GameCode.vue'
 
-import { changeDefaultImage, gameKickPlayer } from '@/service/api-service'
 const props = defineProps({
-    playerId: Number
+    playerNumber: Number
 })
 
+const isHost = ref(false)
+const isYou = ref(false)
+const playerDisconnected = ref(true)
 const playerIcon = ref(Math.ceil(Math.random() * 12))
+const playerActive = ref(false)
+
+const gameState = computed(() => ({
+    [{
+        lobby: 'lobby',
+        turn_player1: `turn${isHost.value ? 'Yours' : 'Opponent'}`,
+        turn_player2: `turn${isHost.value ? 'Opponent' : 'Yours'}`,
+        roundEnd: 'roundEnd',
+        results: 'results',
+    }[gameData.game.state]]: true
+}))
+
 const player = computed(() => {
-    return gameData.game[`player${props.playerId}`] ?? {}
+    const player = gameData.game[`player${props.playerNumber}`] ?? {}
+
+    playerDisconnected.value = player.disconnected
+    playerActive.value = player.playerName
+
+    return player;
 })
-const playerActive = computed(() => {
-    return player.value.playerName && !player.value.disconnected
-})
-const healthPercent = computed(() => {
-    const { health, maxHealth } = player.value
-    return 100 * health / maxHealth
+
+const connection = computed(() => {
+    const connection = gameData.connection
+    isHost.value = connection.player == 1
+    isYou.value = connection.player == props.playerNumber
+
+    return connection;
 })
 
 const selectedImage = computed(() => {
@@ -53,14 +75,9 @@ const selectedImage = computed(() => {
 })
 
 function kickPlayer() {
-    const { socketId } = gameData.game[`player${props.playerId}`]
+    const { socketId } = gameData.game[`player${props.playerNumber}`]
     gameKickPlayer(socketId)
 }
-
-function swapCharacter() {
-    changeDefaultImage()
-}
-
 </script>
 
 <style scoped lang="less">
@@ -81,17 +98,10 @@ function swapCharacter() {
             }
         }
 
-        .health-container,
-        .health-container h1 {
-            scale: -1 1;
-        }
-
-        .health-container h1 {
-            transform: skew(-40deg);
-        }
     }
 
     .player-image {
+
         display: flex;
         z-index: 0;
         position: absolute;
@@ -104,6 +114,10 @@ function swapCharacter() {
             position: absolute;
         }
     }
+}
+
+.disconnected .player-image {
+    opacity: .25;
 }
 
 .player-iAm {
@@ -126,41 +140,12 @@ function swapCharacter() {
     z-index: 1;
 }
 
-.health-container {
-    --width: 100%;
-    height: 30px;
-    width: 60%;
-    position: relative;
-    transform: skew(-40deg);
-    background-color: black;
-    box-shadow: 0 0 7px black;
-
-    h1 {
-        font-size: 30px;
-        position: absolute;
-        top: 50%;
-        translate: 25px -50%;
-        transform: skew(40deg);
-        color: grey;
-        z-index: 2;
-    }
-
-    &::before,
-    &::after {
-        content: '';
-        height: 100%;
-        position: absolute;
-        width: var(--width);
-    }
-
-    &::after {
-        background-color: white;
-        z-index: 1;
-    }
-
-    &::before {
-        background-color: red;
-        transition: width .125s .25s ease-out;
-    }
+.player-options {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    gap: .5rem;
+    margin-bottom: .5rem;
+    bottom: 100%;
 }
 </style>
