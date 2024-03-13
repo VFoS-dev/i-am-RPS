@@ -11,7 +11,7 @@ const useGameDataStore = defineStore('gameData', {
             setTimeout(reconnect, 0)
             return JSON.parse(prevousGame)
         }
-        return { connection: {}, game: {}, images: [], }
+        return { connection: {}, game: {}, images: [], imageHover: null }
     },
     actions: {
         clearAll() {
@@ -38,7 +38,7 @@ const useGameDataStore = defineStore('gameData', {
             router.push({ name: 'game' })
         },
         setImages({ images = [] }) {
-            this.images = [this.images, images].flat()
+            this.images = [...(this.images ?? []), ...images]
         },
         saveGame() {
             sessionStorage.setItem(sName, JSON.stringify({
@@ -49,7 +49,15 @@ const useGameDataStore = defineStore('gameData', {
         changeDefaultImage({ defaultImage }) {
             const player = `player${this.connection.player}`
             this.game[player].defaultImage = defaultImage
-        }
+        },
+        selectionOut(src) {
+            if (this.imageHover == src) {
+                this.imageHover = null
+            }
+        },
+        selectionOver(src) {
+            this.imageHover = src
+        },
     }
 });
 

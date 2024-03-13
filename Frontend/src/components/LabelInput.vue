@@ -19,7 +19,8 @@ const props = defineProps({
     max: String,
     min: String,
     id: String,
-    autocomplete: String
+    autocomplete: String,
+    required: String,
 })
 const active = ref(false);
 const input = ref();
@@ -70,6 +71,19 @@ input {
         transition: color .25s;
         text-align: right;
         color: black;
+    }
+}
+
+.white {
+    input {
+        width: unset;
+        border-bottom-color: white;
+        color: white;
+        text-align: center;
+
+        &::placeholder {
+            color: white;
+        }
     }
 }
 </style>

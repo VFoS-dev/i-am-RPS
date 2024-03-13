@@ -9,12 +9,15 @@
                 {{ player.playerName }}
             </PlayerHealth>
             <div class="player-options" v-if="playerActive">
-                <ImageButtons v-if="isHost && gameState.lobby && !isYou" svg="kick" @onClick="kickPlayer" />
-                <ImageButtons v-if="isYou" svg="swap" @onClick="changeDefaultImage" />
-                <ImageButtons v-if="isYou" svg="leave" @onClick="leaveGame" />
+                <Fragment v-if="props.gameState.lobby">
+                    <ImageButtons v-if="isHost && !isYou" svg="kick" @onClick="kickPlayer" />
+                    <ImageButtons v-if="isYou" svg="swap" @onClick="changeDefaultImage" />
+                    <ImageButtons v-if="isYou" svg="leave" @onClick="leaveGame" />
+                </Fragment>
             </div>
         </div>
-        <div class="player-image" :class="{ hasImage: player.iAm?.image }">
+        <Fragment v-bind="connection" />
+        <div class="player-image" :class="{ hasImage: player.iAm?.image || yourImageHover }">
             <GameCode v-if="!playerActive" :code="gameData.game?.code" />
             <img :src="selectedImage" />
         </div>
@@ -28,9 +31,11 @@ import { changeDefaultImage, gameKickPlayer, leaveGame } from '@/service/api-ser
 import ImageButtons from '@/components/ImageButtons.vue'
 import PlayerHealth from '@/components/PlayerHealth.vue'
 import GameCode from '@/components/GameCode.vue'
+import Fragment from '@/components/Fragment.vue'
 
 const props = defineProps({
-    playerNumber: Number
+    playerNumber: Number,
+    gameState: Object
 })
 
 const isHost = ref(false)
@@ -38,22 +43,13 @@ const isYou = ref(false)
 const playerDisconnected = ref(true)
 const playerIcon = ref(Math.ceil(Math.random() * 12))
 const playerActive = ref(false)
-
-const gameState = computed(() => ({
-    [{
-        lobby: 'lobby',
-        turn_player1: `turn${isHost.value ? 'Yours' : 'Opponent'}`,
-        turn_player2: `turn${isHost.value ? 'Opponent' : 'Yours'}`,
-        roundEnd: 'roundEnd',
-        results: 'results',
-    }[gameData.game.state]]: true
-}))
+const yourImageHover = ref(false)
 
 const player = computed(() => {
     const player = gameData.game[`player${props.playerNumber}`] ?? {}
 
     playerDisconnected.value = player.disconnected
-    playerActive.value = player.playerName
+    playerActive.value = !!Object.keys(player).length
 
     return player;
 })
@@ -62,12 +58,15 @@ const connection = computed(() => {
     const connection = gameData.connection
     isHost.value = connection.player == 1
     isYou.value = connection.player == props.playerNumber
+    yourImageHover.value = gameData.imageHover && isYou.value
 
     return connection;
 })
 
 const selectedImage = computed(() => {
     if (!playerActive.value) return
+
+    if (isYou.value && gameData.imageHover) return gameData.imageHover
 
     if (player.value.iAm?.image) return player.value.iAm.image
 
@@ -127,6 +126,11 @@ function kickPlayer() {
     top: 10%;
     display: flex;
     justify-content: center;
+
+    p {
+        color: white;
+        text-shadow: 0 0 5px black;
+    }
 }
 
 .player-health {
@@ -147,5 +151,12 @@ function kickPlayer() {
     gap: .5rem;
     margin-bottom: .5rem;
     bottom: 100%;
+}
+
+.hasImage img {
+    object-fit: contain;
+    max-height: 100dvh;
+    max-width: 50vw;
+    height: 100dvh;
 }
 </style>

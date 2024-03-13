@@ -11,10 +11,9 @@ async function ImageSearch(searchString, { explicit = false, page = 0 } = {}) {
         searchType: "image",
         key: env('GoogleAPIKey'),
         cx: env('CustomSearchEngine'),
-        imgSize: 'xxlarge',
         num: 10,
         start: parseInt(page + "1"),
-        filter: 0
+        filter: 1
     }
 
     const url = new URL('https://www.googleapis.com/customsearch/v1')

@@ -204,7 +204,7 @@ async function handleResult(socket, gameId, { error, reason, equals, answer }, {
         await game.save()
 
         updateLobby(socket, gameId)
-        notifyPlayer(socket, socket.id, gameCode, { message: reason, title: 'Error with your Selection' })
+        notifyPlayer(socket, socket.id, game.code, { message: reason, title: 'Error with your Selection' })
 
         return { error, reason }
     }

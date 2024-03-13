@@ -34,7 +34,7 @@ async function AbeatsB(A, B) {
     });
 
     let { content } = completion.choices?.[0]?.message ?? {}
-    console.log(content);
+    console.log(completion.choices);
     console.log("A", A);
     console.log("B", B);
     content = content.match(/\{.+\}/)[0]
