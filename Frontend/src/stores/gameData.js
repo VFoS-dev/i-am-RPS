@@ -11,11 +11,16 @@ const useGameDataStore = defineStore('gameData', {
             setTimeout(reconnect, 0)
             return JSON.parse(prevousGame)
         }
-        return { connection: {}, game: {}, images: [], imageHover: null }
+        return {
+            connection: {},
+            game: {},
+            images: [],
+            imageHover: null,
+            promptSubmitted: false,
+        }
     },
     actions: {
         clearAll() {
-            console.log('here');
             this.connection = {}
             this.game = {}
             this.images = []
@@ -36,6 +41,8 @@ const useGameDataStore = defineStore('gameData', {
             this.game = { ...this.game, ...game, }
             this.saveGame()
             router.push({ name: 'game' })
+            this.promptSubmitted = false
+            this.imageHover = null
         },
         setImages({ images = [] }) {
             this.images = [...(this.images ?? []), ...images]
@@ -58,6 +65,9 @@ const useGameDataStore = defineStore('gameData', {
         selectionOver(src) {
             this.imageHover = src
         },
+        submitPrompt() {
+            this.promptSubmitted = true
+        }
     }
 });
 
