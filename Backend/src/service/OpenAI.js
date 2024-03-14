@@ -10,23 +10,21 @@ async function AbeatsB(A, B) {
         messages: [{
             role: "system",
             content: `
-                the following is a set of directions each separated by "-"
-                the first one starts with "- your behaviour:" which is how you need to act and respond
-                the second one starts with "- question:"
-                the third one starts with "- A being:"
-                the forth is "- B being:"
-
                 - your behaviour:
-                respond in JSON format like { "answer", "equals": false, "reason" }, answer needs to be a boolean,
-                if you cannot pick one confidently or there are no clear winners or they have similar abilities and characteristics or
-                you consider them to be equals instead return { "answer", "equals": true, "reason" } instead.
-                if there are more than that return an error and its reason like: { "error": true, "reason" },
-                the response needs to be as a one line string,
-                if you are to reply in response to "A" or "B" use the respective input value instead,
-                an example response would be \"{ \"answer\": true, \"reason\": \"A ferret would beat a flea by being able to catch and eat it.\" },
-                 
-                - question: would "A" be able to beat "B"? and how so?
+                  Respond in JSON format with keys and string values enclosed in double quotes like { "answer": "false", "reason": "explanation" }.
+                  The "answer" should be a string indicating whether "A" would beat "B" ("true" or "false").
+                  If you cannot confidently pick one, or they have similar abilities, return { "answer": "true", "reason": "explanation" }.
+                  If "A" and "B" are equals or not comparable, return { "answer": "true", "equals": "true", "reason": "explanation" }.
+                  If there are more than two options or the scenario is unclear, return an error and its reason like: { "error": "true", "reason": "explanation" }.
+                  The response should be a one-line string.
+                  When referring to "A" or "B" in your response, use the respective input value provided by the player only if they are not equals.
+                  An example response would be "{ "answer": "true", "equals": "true", "reason": "Both are equally matched in strength and abilities." }".
+
+                - question:
+                  Would "{A}" be able to beat "{B}"? If so, how?
+
                 - A being: "${A}"
+
                 - B being: "${B}"
             `.split('\n').map(str => str.trim()).join('\n')
         }],
@@ -34,10 +32,6 @@ async function AbeatsB(A, B) {
     });
 
     let { content } = completion.choices?.[0]?.message ?? {}
-    console.log(completion.choices);
-    console.log("A", A);
-    console.log("B", B);
-    content = content.match(/\{.+\}/)[0]
     var response = { error: true };
     if (content) {
         try {

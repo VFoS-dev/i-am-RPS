@@ -1,5 +1,6 @@
 const { InvalidAttempt } = require('../_helper/error');
 const { gameStates } = require('../_helper/game');
+const { toBoolean } = require('../_helper/misc')
 const gameService = require('../service/gameService');
 const playerService = require('../service/playerService');
 const iAmService = require('../service/iAmService');
@@ -194,6 +195,8 @@ async function roundEnd(socket, { gameId }) {
 }
 
 async function handleResult(socket, gameId, { error, reason, equals, answer }, { A: playerA, B: playerB }) {
+    equals = toBoolean(equals)
+    answer = toBoolean(answer)
     const game = await gameService.getGameById(gameId);
     if (!game) throw new InvalidAttempt('Game was not found');
 
@@ -217,7 +220,7 @@ async function handleResult(socket, gameId, { error, reason, equals, answer }, {
         await game.save()
 
         updateLobby(socket, gameId)
-        notifyPlayer(socket, game[playerA].socketId, gameCode, { message: reason, title: 'Characters are Equals', andLobby: true })
+        notifyPlayer(socket, game[playerA].socketId, game.code, { message: reason, title: 'Characters are Equals', andLobby: true })
 
         return { equals, reason }
     }
