@@ -10,6 +10,10 @@
 import JoinModal from '@/components/JoinModal.vue';
 import CreateModal from '@/components/CreateModal.vue';
 import IAm from '@/components/IAm.vue';
+import { gameData } from '@/stores/gameData';
+import { onMounted } from 'vue';
+
+onMounted(gameData.clearAll)
 </script>
 
 <style scoped lang="less">

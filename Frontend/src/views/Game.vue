@@ -1,19 +1,26 @@
 <template>
     <div class="game-container" :class="[state, `player${gameData.connection.player}`]">
         <Player :playerNumber="1" :gameState="gameState" />
-        <StartGame v-if="isHost && bothPlayers && gameState.lobby" />
-        <Reason />
+        <GameButton v-if="isHost && bothPlayers && gameState.lobby" @onClick="startGame">
+            Start Game
+        </GameButton>
+        <GameButton v-if="gameState.results" @onClick="gameData.clearAll">
+            Go Home
+        </GameButton>
+        <Reason :style="{ opacity: gameData.game.history?.length ?? 0 }" />
         <PlayersTurn v-if="gameState.gameplay" :number="gameState.number">
             {{ yourTurn ? "Your Turn" : "Opponent's Turn" }}
         </PlayersTurn>
+
         <Player :playerNumber="2" :gameState="gameState" />
         <YourMove v-if="yourTurn && !gameData.promptSubmitted" />
     </div>
 </template>
 
 <script setup>
+import { startGame } from '@/service/api-service';
 import Player from '@/components/Player.vue'
-import StartGame from '@/components/StartGame.vue'
+import GameButton from '@/components/GameButton.vue'
 import PlayersTurn from '@/components/PlayersTurn.vue'
 import YourMove from '@/components/YourMove.vue'
 import Reason from '@/components/Reason.vue';

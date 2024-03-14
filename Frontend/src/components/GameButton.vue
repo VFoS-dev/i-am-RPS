@@ -1,11 +1,14 @@
 <template>
-    <button @click="startGame">
-        <div> Start Game </div>
+    <button @click="() => emits('onClick')">
+        <div>
+            <slot> Start Game </slot>
+        </div>
     </button>
 </template>
 
 <script setup>
-import { startGame } from '@/service/api-service';
+import { defineEmits } from 'vue';
+const emits = defineEmits(['onClick'])
 </script>
 
 <style scoped lang="less">

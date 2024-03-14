@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import pinia from './piniaInstance';
-import { reconnect } from '@/service/api-service';
+import { reconnect, leaveGame } from '@/service/api-service';
 import router from '@/router';
 
 const sName = 'PRSgame'
@@ -21,6 +21,9 @@ const useGameDataStore = defineStore('gameData', {
     },
     actions: {
         clearAll() {
+            if (this.game.state && this.game.state != 'results') {
+                leaveGame()
+            }
             this.connection = {}
             this.game = {}
             this.images = []
