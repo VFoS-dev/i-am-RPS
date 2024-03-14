@@ -223,7 +223,6 @@ async function handleResult(socket, gameId, { error, reason, draw, answer }, { A
         await game.save()
 
         updateLobby(socket, gameId)
-        notifyPlayer(socket, game[playerA].socketId, game.code, { message: reason, title: 'Characters are Equals', andLobby: true })
 
         return { draw, reason }
     }

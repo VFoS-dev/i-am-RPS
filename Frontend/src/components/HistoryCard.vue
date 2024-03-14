@@ -1,10 +1,10 @@
 <template>
     <div class="flash-back" :winner="props.winner">
-        <div class="prompts">
+        <div>{{ reason }}</div>
+        <div class="prompt">
             <div>{{ player1 }}</div>
             <div>{{ player2 }}</div>
         </div>
-        <div>{{ reason }}</div>
     </div>
 </template>
 
@@ -27,7 +27,7 @@ const props = defineProps({
     border: 1px black solid;
     --left-color: transparent;
     --right-color: transparent;
-    padding: .5rem;
+    padding: 1rem 3rem;
     color: white;
 
     &>div {
@@ -56,25 +56,33 @@ const props = defineProps({
 
     &[winner="player1"] {
         --left-color: blue;
+        border-top-left-radius: 0;
+        border-bottom-right-radius: 0;
     }
 
     &[winner="player2"] {
         --right-color: blue;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 0;
     }
 
     &[winner="draw"] {
-        --left-color: gold;
-        --right-color: gold;
+        --left-color: rgb(228, 213, 130);
+        --right-color: rgb(228, 213, 130);
+        color: black;
     }
 }
 
-.prompts {
-    margin-bottom: .5rem;
+.prompt {
+    font-size: .65rem;
+    display: flex;
+    gap: .5rem;
+    padding: .2rem 2rem 0;
 
     &>div {
-        display: inline-block;
-        width: 50%;
         text-align: center;
+        width: 50%;
+
     }
 }
 </style>
