@@ -194,8 +194,8 @@ async function roundEnd(socket, { gameId }) {
     }
 }
 
-async function handleResult(socket, gameId, { error, reason, equals, answer }, { A: playerA, B: playerB }) {
-    equals = toBoolean(equals)
+async function handleResult(socket, gameId, { error, reason, draw, answer }, { A: playerA, B: playerB }) {
+    draw = toBoolean(draw)
     answer = toBoolean(answer)
     const game = await gameService.getGameById(gameId);
     if (!game) throw new InvalidAttempt('Game was not found');
@@ -212,17 +212,20 @@ async function handleResult(socket, gameId, { error, reason, equals, answer }, {
         return { error, reason }
     }
 
-    if (equals) {
+    if (draw) {
         game.state = gameStates[`turn_${playerA}`]
         await iAmService.clearIAm(game[playerA].iAm.id)
         await iAmService.clearIAm(game[playerB].iAm.id)
+
+        const history = await addHistory(game.player1.iAm.prompt, game.player2.iAm.prompt, 'draw', reason)
+        game.history = [history.id, ...(game.history ?? [])]
 
         await game.save()
 
         updateLobby(socket, gameId)
         notifyPlayer(socket, game[playerA].socketId, game.code, { message: reason, title: 'Characters are Equals', andLobby: true })
 
-        return { equals, reason }
+        return { draw, reason }
     }
 
     const { focusPlayer, wonPlayer } = {

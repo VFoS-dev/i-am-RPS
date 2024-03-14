@@ -1,5 +1,6 @@
 <template>
     <button :style="`--src:url(/svg/${props.svg}.svg)`" @click="emits('onClick')">
+        <slot></slot>
     </button>
 </template>
 

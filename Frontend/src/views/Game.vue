@@ -2,6 +2,7 @@
     <div class="game-container" :class="[state, `player${gameData.connection.player}`]">
         <Player :playerNumber="1" :gameState="gameState" />
         <StartGame v-if="isHost && bothPlayers && gameState.lobby" />
+        <Reason />
         <PlayersTurn v-if="gameState.gameplay" :number="gameState.number">
             {{ yourTurn ? "Your Turn" : "Opponent's Turn" }}
         </PlayersTurn>
@@ -15,6 +16,7 @@ import Player from '@/components/Player.vue'
 import StartGame from '@/components/StartGame.vue'
 import PlayersTurn from '@/components/PlayersTurn.vue'
 import YourMove from '@/components/YourMove.vue'
+import Reason from '@/components/Reason.vue';
 import { gameData } from '@/stores/gameData';
 import { onMounted, computed } from 'vue';
 import router from '@/router';
