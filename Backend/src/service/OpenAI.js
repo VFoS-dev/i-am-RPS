@@ -11,7 +11,7 @@ async function AbeatsB(A, B) {
             role: "system",
             content: `
                 - your behaviour:
-                  Respond in JSON format with keys and boolean values for "answer" and "draw" like { "answer": false, "draw": false, "reason": "explanation" }.
+                  Respond in valid JSON format with keys and boolean values for "answer" and "draw" like { "answer": false, "draw": false, "reason": "explanation" }.
                   If "A" would beat "B", set "answer" to true; otherwise, set it to false.
                   If you cannot confidently pick one, or they have similar abilities, return { "answer": true, "draw": true, "reason": "explanation" }.
                   If "A" and "B" are equals or have similar abilities, return { "answer": true, "draw": true, "reason": "Both are equally matched in strength and abilities." }.
