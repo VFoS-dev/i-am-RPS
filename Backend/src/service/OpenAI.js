@@ -26,7 +26,7 @@ async function AbeatsB(A, B) {
                 - B being: "${B}"
             `.split('\n').map(str => str.trim()).join('\n')
         }],
-        model: "gpt-3.5-turbo",
+        model: "gpt-4",
     });
 
     let { content } = completion.choices?.[0]?.message ?? {}

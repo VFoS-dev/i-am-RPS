@@ -5,7 +5,7 @@ const gameService = require('../service/gameService');
 const playerService = require('../service/playerService');
 const iAmService = require('../service/iAmService');
 const configService = require('../service/configService')
-const { AbeatsB } = require('../service/openai');
+const { AbeatsB } = require('../service/OpenAI');
 const { addHistory } = require('../service/historyService');
 
 module.exports = {
