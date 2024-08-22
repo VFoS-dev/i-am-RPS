@@ -17,6 +17,7 @@ module.exports = {
     getGameById,
     getGameByPlayerId,
     removeGame,
+    cleanUpRemanent,
 }
 
 async function newGame(player1, configId, keyLength = 4, attempts = 0) {
@@ -65,4 +66,23 @@ async function removeGame(gameId) {
     if (game.config)
         await configService.removeConfigById(game.config.id)
     await Games.deleteOne({ _id: gameId })
+}
+
+async function cleanUpRemanent() {
+    /** Clean up games when either:
+     * 2+ hours in lobby
+     * 30 mins of inactivity
+     */
+
+    const thirdMinutesAgo = new Date(Date.now() - 30 * 60 * 1000)
+    const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000)
+
+    const games = await Games.find({
+        $or: [
+            { lastUpdated: { $lt: thirdMinutesAgo }, state: { $ne: "lobby" } },
+            { lastUpdated: { $lt: twoHoursAgo } }
+        ]
+    })
+
+    games.forEach((g) => removeGame(g._id));
 }

@@ -5,8 +5,8 @@ const gameService = require('../service/gameService');
 const playerService = require('../service/playerService');
 const iAmService = require('../service/iAmService');
 const configService = require('../service/configService')
+const historyService = require('../service/historyService');
 const { AbeatsB } = require('../service/OpenAI');
-const { addHistory } = require('../service/historyService');
 
 module.exports = {
     create,
@@ -27,6 +27,8 @@ async function create(socket, { explicit, playerName, health }) {
 
     socket.join(game.code);
     updateLobby(socket, game._id);
+
+    cleanUpGames().catch(e => console.log('game Error'))
 
     return {
         success: true,
@@ -153,10 +155,13 @@ async function iAm(socket, { gameId, prompt, image }) {
     const iAm = await iAmService.newIAm(player, prompt, image)
     player.iAm = iAm.id
 
+    game.lastUpdated = new Date()
+
+    await game.save()
     await player.save()
 
     updateLobby(socket, game._id)
-    setTimeout(roundEnd, 1000, socket, { gameId })
+    setTimeout(roundEnd, 500, socket, { gameId })
 
     return {
         success: true
@@ -217,7 +222,7 @@ async function handleResult(socket, gameId, { error, reason, draw, answer }, { A
         await iAmService.clearIAm(game[playerA].iAm.id)
         await iAmService.clearIAm(game[playerB].iAm.id)
 
-        const history = await addHistory(game.player1.iAm.prompt, game.player2.iAm.prompt, 'draw', reason)
+        const history = await historyService.addHistory(game.player1.iAm.prompt, game.player2.iAm.prompt, 'draw', reason)
         game.history = [history.id, ...(game.history ?? [])]
 
         await game.save()
@@ -232,7 +237,7 @@ async function handleResult(socket, gameId, { error, reason, draw, answer }, { A
         0: { focusPlayer: playerA, wonPlayer: playerB, },
     }[+answer]
 
-    const history = await addHistory(game.player1.iAm.prompt, game.player2.iAm.prompt, wonPlayer, reason)
+    const history = await historyService.addHistory(game.player1.iAm.prompt, game.player2.iAm.prompt, wonPlayer, reason)
     game.history = [history.id, ...(game.history ?? [])]
 
     const player = await playerService.damagePlayer(game[focusPlayer].id)
@@ -317,4 +322,12 @@ async function validateGame(gameId) {
     return {
         success: true
     }
+}
+
+async function cleanUpGames() {
+    gameService.cleanUpRemanent()
+    playerService.cleanUpRemanent()
+    iAmService.cleanUpRemanent()
+    configService.cleanUpRemanent()
+    historyService.cleanUpRemanent()
 }

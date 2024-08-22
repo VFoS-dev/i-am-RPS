@@ -1,9 +1,10 @@
-const { IAm } = require('../_helper/db')
+const { IAm, Player } = require('../_helper/db')
 
 module.exports = {
     newIAm,
     clearIAm,
     removeIAmById,
+    cleanUpRemanent,
 }
 
 async function newIAm(player, prompt, image) {
@@ -27,4 +28,12 @@ async function clearIAm(iAmId) {
 
 async function removeIAmById(iAmId) {
     await IAm.deleteOne({ _id: iAmId })
+}
+
+async function cleanUpRemanent() {
+    const remanent = await IAm.find({
+        _id: { $nin: await Player.distinct('iAm') }
+    })
+
+    remanent.forEach(r => removeIAmById(r.id))
 }

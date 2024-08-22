@@ -1,4 +1,4 @@
-const { Player, IAm } = require('../_helper/db');
+const { Player, IAm, Games } = require('../_helper/db');
 const { InvalidAttempt } = require('../_helper/error');
 const iAmService = require('./iAmService')
 
@@ -11,6 +11,7 @@ module.exports = {
     updateSocketId,
     removePlayerById,
     changeDefaultPlayer,
+    cleanUpRemanent,
 }
 
 async function newPlayer(socket, playerName, health) {
@@ -80,4 +81,15 @@ async function changeDefaultPlayer(playerId) {
     await Player.updateOne({ _id: playerId }, { defaultImage: selected })
 
     return selected
+}
+
+async function cleanUpRemanent() {
+    const remanent = await Player.find({
+        $and: [
+            { _id: { $nin: await Games.distinct('player1') } },
+            { _id: { $nin: await Games.distinct('player2') } }
+        ]
+    })
+
+    remanent.forEach(p => removePlayerById(p._id))
 }

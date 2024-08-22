@@ -8,7 +8,8 @@ const schema = new Schema({
     history: [{ type: Schema.Types.ObjectId, ref: 'history' }],
     player1: { type: Schema.Types.ObjectId, ref: 'player', required: true },
     player2: { type: Schema.Types.ObjectId, ref: 'player' },
-    config: { type: Schema.Types.ObjectId, ref: 'config' }
+    config: { type: Schema.Types.ObjectId, ref: 'config' },
+    lastUpdated: { type: Date, default: new Date() }
 });
 
 schema.set('toJSON', { virtuals: true });
