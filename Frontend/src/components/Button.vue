@@ -9,7 +9,7 @@
 import { defineEmits, defineProps } from 'vue'
 const emits = defineEmits(['onClick'])
 const props = defineProps({
-    type: String,
+    type: { type: String, default: 'button' },
     feather: { type: String, default: 'right' },
     side: { type: String, default: 'right' },
 })
@@ -57,6 +57,10 @@ button {
     &:active {
         translate: calc(var(--dir) * 5px) 5px;
         box-shadow: 0px 0px 0 black;
+    }
+
+    &.nav {
+        background-color: lightgray;
     }
 }
 </style>

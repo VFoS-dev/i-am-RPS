@@ -2,7 +2,7 @@
     <InsetCircles class="modal" size="4rem" cardColor="white">
         <h1>Host Game</h1>
         <form @submit="handleSubmit">
-            <LabelInput @onChange="handleChange" id="playerName" maxlength="25">
+            <LabelInput @onChange="handleChange" id="playerName" maxlength="25" required>
                 Player Name
             </LabelInput>
             <LabelInput @onChange="handleChange" id="health" type="number" placeholder="5" max='20' min="1">
@@ -11,7 +11,11 @@
             <LabelCheckbox @onChange="handleChange" id="explicit" :checked="false">
                 Allow Explicit Images
             </LabelCheckbox>
-            <Button type="submit">Create</Button>
+            <div class="button-group">
+                <Button type="submit">Create</Button>
+                <div class="grow"></div>
+                <Button class="nav" @click="change" side="left" feather="left">Join</Button>
+            </div>
         </form>
     </InsetCircles>
 </template>
@@ -23,6 +27,9 @@ import LabelCheckbox from '@/components/LabelCheckbox.vue'
 import Button from '@/components/Button.vue'
 import { ref } from 'vue'
 import { gameCreate } from '@/service/api-service'
+
+const emit = defineEmits(['changeState'])
+const change = () => emit('changeState')
 
 const values = ref({
     playerName: '',

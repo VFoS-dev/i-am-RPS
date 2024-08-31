@@ -51,7 +51,7 @@ const classes = computed(() => {
     justify-content: center;
     align-items: center;
     z-index: 0;
-    position: absolute;
+    position: fixed;
     transition: background-color .75s;
     background-color: var(--selected-color);
 
@@ -103,6 +103,7 @@ const classes = computed(() => {
 .position {
     position: absolute;
     transform-origin: center;
+    --distance: clamp(225px, 40vmin, 45vmax);
 
     .color-match,
     .choice {
@@ -122,7 +123,7 @@ const classes = computed(() => {
     }
 
     &.rock {
-        translate: 0 -30dvh;
+        translate: calc(cos(-90deg) * var(--distance)) calc(sin(-90deg) * var(--distance));
 
         .choice {
             background-image: url('/images/rock.png');
@@ -130,7 +131,7 @@ const classes = computed(() => {
     }
 
     &.paper {
-        translate: 25.9807dvh 15dvh;
+        translate: calc(cos(30deg) * var(--distance)) calc(sin(30deg) * var(--distance));
 
         .choice {
             background-image: url('/images/paper.png');
@@ -138,7 +139,7 @@ const classes = computed(() => {
     }
 
     &.scissors {
-        translate: -25.9807dvh 15dvh;
+        translate: calc(cos(150deg) * var(--distance)) calc(sin(150deg) * var(--distance));
 
         .choice {
             background-image: url('/images/scissors.png');

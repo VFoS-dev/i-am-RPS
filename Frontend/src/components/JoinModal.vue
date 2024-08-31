@@ -2,13 +2,15 @@
     <InsetCircles class="modal" size="4rem" cardColor="white">
         <h1>Join Game</h1>
         <form @submit="handleSubmit">
-            <LabelInput @onChange="handleChange" id="playerName" maxlength="25">
+            <LabelInput @onChange="handleChange" id="playerName" maxlength="25" required>
                 Player Name
             </LabelInput>
-            <LabelInput @onChange="handleChange" id="gameCode" autocomplete="false">
+            <LabelInput @onChange="handleChange" id="gameCode" autocomplete="false" required>
                 Game Code
             </LabelInput>
-            <div class="button-left">
+            <div class="button-group">
+                <Button class="nav" @click="change">Create</Button>
+                <div class="grow"></div>
                 <Button type="submit" side="left" feather="left">Join</Button>
             </div>
         </form>
@@ -21,6 +23,9 @@ import LabelInput from '@/components/LabelInput.vue'
 import Button from '@/components/Button.vue'
 import { ref } from 'vue'
 import { gameJoin } from '@/service/api-service'
+
+const emit = defineEmits(['changeState'])
+const change = () => emit('changeState')
 
 const values = ref({
     playerName: '',
@@ -49,10 +54,5 @@ form,
     display: flex;
     flex-direction: column;
     gap: 1rem;
-}
-
-.button-left {
-    display: flex;
-    justify-content: end;
 }
 </style>
