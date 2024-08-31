@@ -33,13 +33,7 @@ function toggleState() {
     align-items: center;
 }
 
-@media (min-width: 901px) {
-    ::v-deep button.nav {
-        display: none;
-    }
-}
-
-@media (max-width: 900px) {
+:root[data-mobile="true"] {
     .container[state='join']>[state='create'] {
         display: none;
     }

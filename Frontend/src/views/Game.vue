@@ -70,4 +70,10 @@ const bothPlayers = computed(() => {
     flex-direction: row;
     height: 100dvh;
 }
+
+:root[data-mobile="true"][data-rotation="portrait"] {
+    .game-container {
+        flex-direction: column;
+    }
+}
 </style>

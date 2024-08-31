@@ -1,18 +1,34 @@
 <template>
-    <div class="turn-indicator">
-        <h1>
-            <slot></slot>
-        </h1>
-        <img class="pointer" src="/svg/arrow.svg" />
+    <div class="turn-container">
+        <div class="turn-indicator">
+            <h1 class="t-boarder">
+                <slot></slot>
+            </h1>
+            <img class="pointer" src="/svg/arrow.svg" />
+        </div>
     </div>
 </template>
 
 <style scoped lang="less">
-.turn-indicator {
+.turn-container {
+    pointer-events: none;
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    height: 100dvh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &[number="1"] .pointer {
+        rotate: -135deg;
+    }
+
+    &[number="2"] .pointer {
+        rotate: 45deg;
+    }
+}
+
+.turn-indicator {
     z-index: 1;
     display: flex;
     flex-direction: column;
@@ -31,13 +47,15 @@
         align-items: center;
         transition: rotate .2s;
     }
+}
 
-    &[number="1"] .pointer {
-        rotate: -135deg;
+:root[data-mobile="true"][data-rotation="portrait"] {
+    h1 {
+        text-wrap: nowrap;
     }
 
-    &[number="2"] .pointer {
-        rotate: 45deg;
+    img {
+        display: none;
     }
 }
 </style>

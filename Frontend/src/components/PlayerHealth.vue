@@ -28,10 +28,10 @@ const healthPercent = computed(() => {
 .health-container {
     --width: 0%;
     height: 30px;
-    width: 60%;
+    width: 80%;
     position: relative;
     transform: skew(-40deg);
-    background-color: black;
+    background-color: #2f1010;
     box-shadow: 0 0 7px black;
 
     &.noPlayer {

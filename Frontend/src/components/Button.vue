@@ -59,7 +59,8 @@ button {
         box-shadow: 0px 0px 0 black;
     }
 
-    &.nav {
+
+    &.gray {
         background-color: lightgray;
     }
 }

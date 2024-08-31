@@ -14,7 +14,7 @@
             <div class="button-group">
                 <Button type="submit">Create</Button>
                 <div class="grow"></div>
-                <Button class="nav" @click="change" side="left" feather="left">Join</Button>
+                <Button class="only-mobile gray" @click="change" side="left" feather="left">Join</Button>
             </div>
         </form>
     </InsetCircles>

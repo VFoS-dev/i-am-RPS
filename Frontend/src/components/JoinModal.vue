@@ -9,7 +9,7 @@
                 Game Code
             </LabelInput>
             <div class="button-group">
-                <Button class="nav" @click="change">Create</Button>
+                <Button class="only-mobile gray" @click="change">Create</Button>
                 <div class="grow"></div>
                 <Button type="submit" side="left" feather="left">Join</Button>
             </div>

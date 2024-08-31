@@ -1,6 +1,7 @@
 <template>
     <div class="turn-container">
         <div ref="imageSlider" class="images-container state" :class="{ show: images?.length }">
+            {{ dragging }}
             <ImageSelection v-for="url of images" :src="url" @selectImage="submitMove" />
             <div class="backdrop"></div>
         </div>
@@ -22,12 +23,16 @@ import { dragSlide } from '@/_helper/dragSlide'
 const images = computed(() => gameData.images ?? [])
 const imageSlider = ref()
 const query = ref("")
+const dragging = ref(false);
 function ImageSearch(e) {
     e.preventDefault();
     googleImageSearch(query.value)
 }
 
 function submitMove(url) {
+    if (dragging.value) return;
+    console.log(dragging.value);
+
     gameData.clearImages()
     gameIAm(query.value, url)
     query.value = ''
@@ -36,15 +41,22 @@ function submitMove(url) {
 const handleChange = ({ target: { value } }) => query.value = value
 
 onMounted(() => {
-    dragSlide(imageSlider.value)
+    dragSlide(imageSlider.value, canClick)
 })
+
+function canClick(_dragging) {
+    console.log('here', dragging.value, _dragging);
+
+    if (dragging.value === _dragging) return
+    dragging.value = _dragging;
+}
 </script>
 
 <style scoped lang="less">
 .turn-container {
     z-index: 3;
-    position: absolute;
-    width: 100vw;
+    position: fixed;
+    width: 100%;
     top: 60%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -54,22 +66,16 @@ onMounted(() => {
         position: absolute;
         top: 0%;
 
-        &.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-
         &:not(.show) {
-            opacity: 0;
-            pointer-events: none;
+            display: none;
         }
     }
 
 
     .input {
-        width: 100vw;
+        width: 100%;
         min-height: 120px;
-        padding: 2rem;
+        padding: 1rem 0;
         display: flex;
         justify-content: center;
         flex-direction: column;
@@ -82,6 +88,7 @@ onMounted(() => {
         color: white;
         box-shadow: 0px 0px 30px black;
         gap: 1rem;
+        transform: translateY(-50%);
 
         input {
             width: 400px;
@@ -90,7 +97,7 @@ onMounted(() => {
     }
 
     .images-container {
-        --size: 50vmin;
+        --size: max(50vmin, 300px);
         display: flex;
         max-width: 100vw;
         align-items: center;
@@ -137,6 +144,12 @@ onMounted(() => {
         &::before {
             left: 0;
         }
+    }
+}
+
+:root[data-mobile="true"] {
+    .turn-container {
+        top: 50%;
     }
 }
 </style>

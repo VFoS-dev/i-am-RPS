@@ -1,4 +1,4 @@
-export function dragSlide(element) {
+export function dragSlide(element, isDragging = () => { }) {
   let mouseDown = false;
   let startX, scrollLeft;
 
@@ -10,6 +10,7 @@ export function dragSlide(element) {
 
   const stopDragging = (e) => {
     mouseDown = false;
+    setTimeout(isDragging, 0, false)
   }
 
   const move = (e) => {
@@ -18,7 +19,9 @@ export function dragSlide(element) {
     const x = e.pageX - element.offsetLeft;
     const scroll = x - startX;
     element.scrollLeft = scrollLeft - scroll;
+    isDragging(true)
   }
+
 
   // Add the event listeners
   element.addEventListener('mousemove', move, false);

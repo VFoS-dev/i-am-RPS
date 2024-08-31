@@ -1,11 +1,9 @@
 <template>
-    <div class="image" :style="`--url:url(${props.src});`" @mouseleave="onBlur" @mouseover="onHover">
-        <button class="selection" @click="selectImage">
-            Select Image
-        </button>
+    <button @click="selectImage" class="image" :style="`--url:url(${props.src});`" @mouseleave="onBlur"
+        @mouseover="onHover">
         <img :src="props.src" class="inner-image" />
         <div class="backdrop"></div>
-    </div>
+    </button>
 </template>
 
 <script setup>
@@ -55,24 +53,26 @@ const onHover = () => gameData.selectionOver(props.src)
     }
 }
 
-.inner-image {
-    height: 100vh;
-    max-width: 100%;
-    max-height: 100%;
+.inner-image,
+.backdrop {
+    top: 0;
+    left: 0;
     position: absolute;
+    height: 100%;
+    max-width: 100%;
+}
+
+.inner-image {
     left: 50%;
     transform: translateX(-50%);
     pointer-events: none;
     background-size: contain;
     background-color: rgba(0, 0, 0, 0.336);
     z-index: 0;
-
 }
 
 .backdrop {
-    position: absolute;
     width: 100%;
-    height: 100%;
     z-index: -1;
     background-color: rgba(0, 0, 0, 0.247);
     backdrop-filter: blur(10px);

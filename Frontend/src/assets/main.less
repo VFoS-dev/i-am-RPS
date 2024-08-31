@@ -3,7 +3,7 @@
 }
 
 body {
-    min-height: 100dvh;
+    min-height: 100%;
     background: var(--background-color);
     overflow: hidden;
 }
@@ -93,4 +93,12 @@ button {
 .button-group {
     display: flex;
     justify-content: space-between;
+}
+
+:root[data-mobile="false"] .only-mobile {
+    display: none;
+}
+
+.t-boarder {
+    text-shadow: -.1rem -.1rem 0 black, .1rem -.1rem 0 black, -.1rem .1rem 0 black, .1rem .1rem 0 black;
 }

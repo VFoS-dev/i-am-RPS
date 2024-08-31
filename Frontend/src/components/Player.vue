@@ -2,7 +2,7 @@
     <div class="player"
         :class="[{ left: 1 == props.playerNumber, disconnected: playerDisconnected }, `player${props.playerNumber}`]">
         <div v-if="playerActive" class="player-iAm">
-            <p v-if="player.iAm?.prompt">I am: <strong>{{ player.iAm?.prompt }}</strong></p>
+            <p class="t-boarder" v-if="player.iAm?.prompt">I am: <strong>{{ player.iAm?.prompt }}</strong></p>
         </div>
         <div class="player-health">
             <PlayerHealth :maxHealth="player.maxHealth" :health="player.health" :playerActive="playerActive">
@@ -86,26 +86,30 @@ function kickPlayer() {
     height: 100%;
     flex-grow: 1;
     overflow: hidden;
+    --border: 1px solid black;
 
     &.left {
-        border-right: 1px solid black;
+        border-right: var(--border);
 
         .player-image:not(.hasImage) {
             img {
                 scale: -1 1;
                 transform: translate(50%, -50%);
+                max-height: 80dvh;
             }
         }
-
     }
 
     .player-image {
-
         display: flex;
         z-index: 0;
         position: absolute;
         top: 50%;
         left: 50%;
+
+        &:not(.hasImage) img {
+            max-height: 90dvh;
+        }
 
         img {
             z-index: -1;
@@ -129,7 +133,6 @@ function kickPlayer() {
 
     p {
         color: white;
-        text-shadow: 0 0 5px black;
     }
 }
 
@@ -158,5 +161,40 @@ function kickPlayer() {
     max-height: 100dvh;
     max-width: 50vw;
     height: 100dvh;
+}
+
+:root[data-mobile="true"][data-rotation="portrait"] {
+    .player {
+        width: 100vw;
+
+        &.left {
+            border-right: none;
+            border-bottom: var(--border);
+        }
+
+        &:not(.left) {
+            .player-health {
+                top: 10%;
+                bottom: unset;
+            }
+
+            .player-options {
+                top: 100%;
+                margin-top: .5rem;
+            }
+        }
+
+        img {
+            max-height: 50dvh;
+        }
+    }
+
+    .player-iAm {
+        top: 50%;
+    }
+
+    .hasImage img {
+        max-width: 100vw;
+    }
 }
 </style>

@@ -35,7 +35,7 @@ function handleClick() {
 
 <style scoped lang="less">
 .history {
-    z-index: 3;
+    z-index: 4;
     position: absolute;
     top: 30%;
     right: 50%;

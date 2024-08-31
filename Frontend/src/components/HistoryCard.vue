@@ -1,13 +1,14 @@
 <template>
     <div class="flash-back" :winner="props.winner">
+        <div class="only-mobile">{{ player1 }}</div>
         <div>{{ reason }}</div>
+        <div class="only-mobile">{{ player2 }}</div>
         <div class="prompt">
             <div>{{ player1 }}</div>
             <div>{{ player2 }}</div>
         </div>
     </div>
 </template>
-
 
 <script setup>
 const props = defineProps({
@@ -23,11 +24,11 @@ const props = defineProps({
     overflow: hidden;
     background-color: gray;
     position: relative;
-    border-radius: 100vw;
+    border-radius: 3rem;
     border: 1px black solid;
     --left-color: transparent;
     --right-color: transparent;
-    padding: 1rem 3rem;
+    padding: 1rem;
     color: white;
 
     &>div {
@@ -83,6 +84,34 @@ const props = defineProps({
         text-align: center;
         width: 50%;
 
+    }
+}
+
+:root[data-mobile="true"][data-rotation="portrait"] {
+    .flash-back {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+
+        &::after,
+        &::before {
+            width: 100%;
+            height: 33%;
+        }
+
+        &::after {
+            top: unset;
+            bottom: 0;
+            background: linear-gradient(to top, var(--right-color), transparent);
+        }
+
+        &::before {
+            background: linear-gradient(to top, transparent, var(--left-color));
+        }
+    }
+
+    .prompt {
+        display: none;
     }
 }
 </style>
