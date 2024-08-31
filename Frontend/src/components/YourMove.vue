@@ -1,7 +1,6 @@
 <template>
     <div class="turn-container">
         <div ref="imageSlider" class="images-container state" :class="{ show: images?.length }">
-            {{ dragging }}
             <ImageSelection v-for="url of images" :src="url" @selectImage="submitMove" />
             <div class="backdrop"></div>
         </div>
